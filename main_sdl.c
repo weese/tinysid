@@ -20,8 +20,10 @@
 
 #include "sys.h"
 
+#ifdef USE_SDL
 #include <SDL.h>
 #include <SDL_endian.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,7 +102,9 @@ static void usage(const char *prg_name)
 static void quit()
 {
     ExitAll();
+#ifdef USE_SDL
     SDL_Quit();
+#endif
 }
 
 int main(int argc, char **argv)
@@ -116,11 +120,14 @@ int main(int argc, char **argv)
         "For details, see the file COPYING.\n\n"
     );
 
+#ifdef USE_SDL
     // Initialize everything
     if (SDL_Init(SDL_INIT_AUDIO) < 0) {
         fprintf(stderr, "Couldn't initialize SDL (%s)\n", SDL_GetError());
         exit(1);
     }
+#endif
+
     atexit(quit);
     InitAll(argc, argv);
     int32_t speed = PrefsFindInt32("speed");
@@ -168,6 +175,7 @@ int main(int argc, char **argv)
     printf("Copyright  : %s\n\n", copyright_info);
     printf("Playing song %d/%d\n", current_song + 1, number_of_songs);
 
+#ifdef USE_SDL
     // Start replay and enter main loop
     SDL_PauseAudio(false);
     while (true) {
@@ -177,7 +185,7 @@ int main(int argc, char **argv)
                 break;
         }
     }
-
+#endif
     ExitAll();
     return 0;
 }
