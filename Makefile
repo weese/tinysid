@@ -1,4 +1,5 @@
-CC = gcc
+#CC = gcc
+CC = gcc-mp-4.7
 CFLAGS = -Wall -ggdb $(shell sdl-config --cflags)
 LDFLAGS = $(shell sdl-config --libs)
 
