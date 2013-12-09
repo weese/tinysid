@@ -216,83 +216,83 @@ case 0x9a:    // TXS
 
 // Arithmetic group
 case 0x69: {// ADC #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     do_adc(t);
 }
 case 0x65: {// ADC zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     do_adc(t);
 }
 case 0x75: {// ADC zero,X
-    uint8 t;
+    uint8_t t;
     read_byte_zero_x(t);
     do_adc(t);
 }
 case 0x6d: {// ADC abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     do_adc(t);
 }
 case 0x7d: {// ADC abs,X
-    uint8 t;
+    uint8_t t;
     read_byte_abs_x(t);
     do_adc(t);
 }
 case 0x79: {// ADC abs,Y
-    uint8 t;
+    uint8_t t;
     read_byte_abs_y(t);
     do_adc(t);
 }
 case 0x61: {// ADC (ind,X)
-    uint8 t;
+    uint8_t t;
     read_byte_ind_x(t);
     do_adc(t);
 }
 case 0x71: {// ADC (ind),Y
-    uint8 t;
+    uint8_t t;
     read_byte_ind_y(t);
     do_adc(t);
 }
 case 0xe9:    // SBC #imm
 case 0xeb: {// Undocumented opcode
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     do_sbc(t);
 }
 case 0xe5: {// SBC zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     do_sbc(t);
 }
 case 0xf5: {// SBC zero,X
-    uint8 t;
+    uint8_t t;
     read_byte_zero_x(t);
     do_sbc(t);
 }
 case 0xed: {// SBC abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     do_sbc(t);
 }
 case 0xfd: {// SBC abs,X
-    uint8 t;
+    uint8_t t;
     read_byte_abs_x(t);
     do_sbc(t);
 }
 case 0xf9: {// SBC abs,Y
-    uint8 t;
+    uint8_t t;
     read_byte_abs_y(t);
     do_sbc(t);
 }
 case 0xe1: {// SBC (ind,X)
-    uint8 t;
+    uint8_t t;
     read_byte_ind_x(t);
     do_sbc(t);
 }
 case 0xf1: {// SBC (ind),Y
-    uint8 t;
+    uint8_t t;
     read_byte_ind_y(t);
     do_sbc(t);
 }
@@ -371,145 +371,145 @@ case 0xde: {// DEC abs,X
 
 // Logic group
 case 0x29: {// AND #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     set_nz(RA &= t);
     break;
 }
 case 0x25: {// AND zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     set_nz(RA &= t);
     break;
 }
 case 0x35: {// AND zero,X
-    uint8 t;
+    uint8_t t;
     read_byte_zero_x(t);
     set_nz(RA &= t);
     break;
 }
 case 0x2d: {// AND abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     set_nz(RA &= t);
     break;
 }
 case 0x3d: {// AND abs,X
-    uint8 t;
+    uint8_t t;
     read_byte_abs_x(t);
     set_nz(RA &= t);
     break;
 }
 case 0x39: {// AND abs,Y
-    uint8 t;
+    uint8_t t;
     read_byte_abs_y(t);
     set_nz(RA &= t);
     break;
 }
 case 0x21: {// AND (ind,X)
-    uint8 t;
+    uint8_t t;
     read_byte_ind_x(t);
     set_nz(RA &= t);
     break;
 }
 case 0x31: {// AND (ind),Y
-    uint8 t;
+    uint8_t t;
     read_byte_ind_y(t);
     set_nz(RA &= t);
     break;
 }
 case 0x09: {// ORA #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     set_nz(RA |= t);
     break;
 }
 case 0x05: {// ORA zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     set_nz(RA |= t);
     break;
 }
 case 0x15: {// ORA zero,X
-    uint8 t;
+    uint8_t t;
     read_byte_zero_x(t);
     set_nz(RA |= t);
     break;
 }
 case 0x0d: {// ORA abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     set_nz(RA |= t);
     break;
 }
 case 0x1d: {// ORA abs,X
-    uint8 t;
+    uint8_t t;
     read_byte_abs_x(t);
     set_nz(RA |= t);
     break;
 }
 case 0x19: {// ORA abs,Y
-    uint8 t;
+    uint8_t t;
     read_byte_abs_y(t);
     set_nz(RA |= t);
     break;
 }
 case 0x01: {// ORA (ind,X)
-    uint8 t;
+    uint8_t t;
     read_byte_ind_x(t);
     set_nz(RA |= t);
     break;
 }
 case 0x11: {// ORA (ind),Y
-    uint8 t;
+    uint8_t t;
     read_byte_ind_y(t);
     set_nz(RA |= t);
     break;
 }
 case 0x49: {// EOR #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     set_nz(RA ^= t);
     break;
 }
 case 0x45: {// EOR zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     set_nz(RA ^= t);
     break;
 }
 case 0x55: {// EOR zero,X
-    uint8 t;
+    uint8_t t;
     read_byte_zero_x(t);
     set_nz(RA ^= t);
     break;
 }
 case 0x4d: {// EOR abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     set_nz(RA ^= t);
     break;
 }
 case 0x5d: {// EOR abs,X
-    uint8 t;
+    uint8_t t;
     read_byte_abs_x(t);
     set_nz(RA ^= t);
     break;
 }
 case 0x59: {// EOR abs,Y
-    uint8 t;
+    uint8_t t;
     read_byte_abs_y(t);
     set_nz(RA ^= t);
     break;
 }
 case 0x41: {// EOR (ind,X)
-    uint8 t;
+    uint8_t t;
     read_byte_ind_x(t);
     set_nz(RA ^= t);
     break;
 }
 case 0x51: {// EOR (ind),Y
-    uint8 t;
+    uint8_t t;
     read_byte_ind_y(t);
     set_nz(RA ^= t);
     break;
@@ -518,72 +518,72 @@ case 0x51: {// EOR (ind),Y
 
 // Compare group
 case 0xc9: {// CMP #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     do_cmp;
 }
 case 0xc5: {// CMP zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     do_cmp;
 }
 case 0xd5: {// CMP zero,X
-    uint8 t;
+    uint8_t t;
     read_byte_zero_x(t);
     do_cmp;
 }
 case 0xcd: {// CMP abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     do_cmp;
 }
 case 0xdd: {// CMP abs,X
-    uint8 t;
+    uint8_t t;
     read_byte_abs_x(t);
     do_cmp;
 }
 case 0xd9: {// CMP abs,Y
-    uint8 t;
+    uint8_t t;
     read_byte_abs_y(t);
     do_cmp;
 }
 case 0xc1: {// CMP (ind,X)
-    uint8 t;
+    uint8_t t;
     read_byte_ind_x(t);
     do_cmp;
 }
 case 0xd1: {// CMP (ind),Y
-    uint8 t;
+    uint8_t t;
     read_byte_ind_y(t);
     do_cmp;
 }
 case 0xe0: {// CPX #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     do_cpx;
 }
 case 0xe4: {// CPX zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     do_cpx;
 }
 case 0xec: {// CPX abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     do_cpx;
 }
 case 0xc0: {// CPY #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     do_cpy;
 }
 case 0xc4: {// CPY zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     do_cpy;
 }
 case 0xcc: {// CPY abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     do_cpy;
 }
@@ -591,12 +591,12 @@ case 0xcc: {// CPY abs
 
 // Bit-test group
 case 0x24: {// BIT zero
-    uint8 t;
+    uint8_t t;
     read_byte_zero(t);
     do_bit;
 }
 case 0x2c: {// BIT abs
-    uint8 t;
+    uint8_t t;
     read_byte_abs(t);
     do_bit;
 }
@@ -656,7 +656,7 @@ case 0x5e: {// LSR abs,X
     do_lsr(write_byte_rmw);
 }
 case 0x2a: {// ROL A
-    uint8 t = RA;
+    uint8_t t = RA;
     set_nz(RA = (RA << 1) | (PFLAGS & PFLAG_C));
     (t & 0x80) ? (PFLAGS |= PFLAG_C) : (PFLAGS &= ~PFLAG_C);
     read_idle_opcode; next_cycle;
@@ -683,7 +683,7 @@ case 0x3e: {// ROL abs,X
     do_rol(write_byte_rmw);
 }
 case 0x6a: {// ROR A
-    uint8 t = RA;
+    uint8_t t = RA;
     set_nz(RA = ((PFLAGS & PFLAG_C) ? ((RA >> 1) | 0x80) : (RA >> 1)));
     (t & 0x01) ? (PFLAGS |= PFLAG_C) : (PFLAGS &= ~PFLAG_C);
     read_idle_opcode; next_cycle;
@@ -731,7 +731,7 @@ case 0x08:    // PHP
 case 0x28: {// PLP
     read_idle_opcode; next_cycle;
     read_idle_stack(RSP); next_cycle;
-    uint8 old_pflags = PFLAGS;
+    uint8_t old_pflags = PFLAGS;
     pop_flags;
     if (!(old_pflags & PFLAG_I) && (PFLAGS & PFLAG_I))
         opcode |= OPFLAG_IRQ_DISABLED;
@@ -749,12 +749,12 @@ case 0x4c:    // JMP abs
 
 case 0x6c: {// JMP (ind)
     read_adr_abs;
-    uint8 t = read_byte(ADR); next_cycle;
+    uint8_t t = read_byte(ADR); next_cycle;
     jump(t | (read_byte(((ADR + 1) & 0xff) | (ADR & 0xff00)) << 8)); next_cycle;
     break;
 }
 case 0x20: {// JSR abs
-    uint8 t = read_opcode; inc_pc; next_cycle;
+    uint8_t t = read_opcode; inc_pc; next_cycle;
     read_idle_stack(RSP); next_cycle;
     push_byte(RPC >> 8); next_cycle;
     push_byte(RPC); next_cycle;
@@ -764,7 +764,7 @@ case 0x20: {// JSR abs
 case 0x60: {// RTS
     read_idle_opcode; next_cycle;
     read_idle_stack(RSP); next_cycle;
-    uint8 t = pop_byte; next_cycle;
+    uint8_t t = pop_byte; next_cycle;
     jump(t | (pop_byte << 8)); inc_pc; next_cycle;
     read_idle_opcode; next_cycle;
     break;
@@ -779,7 +779,7 @@ case 0x00: {// BRK
     push_byte(RPC); next_cycle;
     push_flags(PFLAG_B);
     PFLAGS |= PFLAG_I;
-    uint8 t = read_byte(0xfffe); next_cycle;
+    uint8_t t = read_byte(0xfffe); next_cycle;
     jump(t | (read_byte(0xffff) << 8 )); next_cycle;
     break;
 }
@@ -1156,14 +1156,14 @@ case 0xf3: {// ISB (ind),Y
 // Complex functions
 case 0x0b:    // ANC #imm
 case 0x2b: {
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     set_nz(RA &= t);
     (N_FLAG & 0x80) ? (PFLAGS |= PFLAG_C) : (PFLAGS &= ~PFLAG_C);
     break;
 }
 case 0x4b: {// ASR #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     RA &= t;
     (RA & 0x01) ? (PFLAGS |= PFLAG_C) : (PFLAGS &= ~PFLAG_C);
@@ -1190,7 +1190,7 @@ case 0x6b: {// ARR #imm
     break;
 }
 case 0x8b: {// ANE #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     set_nz(RA = (RA | 0xee) & RX & t);
     break;
@@ -1221,13 +1221,13 @@ case 0x9f: {// SHA abs,Y
     break;
 }
 case 0xab: {// LXA #imm
-    uint8 t;
+    uint8_t t;
     read_byte_imm(t);
     set_nz(RA = RX = (RA | 0xee) & t);
     break;
 }
 case 0xbb: {// LAS abs,Y
-    uint8 t;
+    uint8_t t;
     read_byte_abs_y(t);
     set_nz(RA = RX = RSP = t & RSP);
     break;
@@ -1287,7 +1287,7 @@ case 0x5c:
 case 0x7c:
 case 0xdc:
 case 0xfc: {
-    uint8 t;
+    uint8_t t;
     read_byte_abs_x(t);
     break;
 }

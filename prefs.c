@@ -239,9 +239,9 @@ void PrefsAddBool(const char *name, bool b)
     add_data(name, TYPE_BOOLEAN, &b, sizeof(bool));
 }
 
-void PrefsAddInt32(const char *name, int32 val)
+void PrefsAddInt32(const char *name, int32_t val)
 {
-    add_data(name, TYPE_INT32, &val, sizeof(int32));
+    add_data(name, TYPE_INT32, &val, sizeof(int32_t));
 }
 
 
@@ -288,15 +288,15 @@ void PrefsReplaceBool(const char *name, bool b)
         add_data(name, TYPE_BOOLEAN, &b, sizeof(bool));
 }
 
-void PrefsReplaceInt32(const char *name, int32 val)
+void PrefsReplaceInt32(const char *name, int32_t val)
 {
     prefs_node *p = find_node(name, TYPE_INT32, 0);
     if (p) {
         if (p->desc && p->desc->func)
-            ((prefs_func_int32)(p->desc->func))(name, *(int32 *)(p->data), val);
-        *(int32 *)(p->data) = val;
+            ((prefs_func_int32_t)(p->desc->func))(name, *(int32_t *)(p->data), val);
+        *(int32_t *)(p->data) = val;
     } else
-        add_data(name, TYPE_INT32, &val, sizeof(int32));
+        add_data(name, TYPE_INT32, &val, sizeof(int32_t));
 }
 
 
@@ -322,11 +322,11 @@ bool PrefsFindBool(const char *name)
         return false;
 }
 
-int32 PrefsFindInt32(const char *name)
+int32_t PrefsFindInt32(const char *name)
 {
     prefs_node *p = find_node(name, TYPE_INT32, 0);
     if (p)
-        return *(int32 *)(p->data);
+        return *(int32_t *)(p->data);
     else
         return 0;
 }
@@ -382,7 +382,7 @@ void PrefsSetCallbackBool(const char *name, prefs_func_bool f)
     set_callback(name, (prefs_func)f);
 }
 
-void PrefsSetCallbackInt32(const char *name, prefs_func_int32 f)
+void PrefsSetCallbackInt32(const char *name, prefs_func_int32_t f)
 {
     set_callback(name, (prefs_func)f);
 }

@@ -21,7 +21,8 @@
 #ifndef PREFS_H
 #define PREFS_H
 
-#include "types.h"
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 
 
@@ -33,13 +34,13 @@
 typedef void (*prefs_func)(const char *, int, int);
 typedef void (*prefs_func_string)(const char *, const char *, const char *);
 typedef void (*prefs_func_bool)(const char *, bool, bool);
-typedef void (*prefs_func_int32)(const char *, int32, int32);
+typedef void (*prefs_func_int32_t)(const char *, int32_t, int32_t);
 
 // Item types
 typedef enum prefs_type {
     TYPE_STRING,        // char[]
     TYPE_BOOLEAN,        // bool
-    TYPE_INT32,            // int32
+    TYPE_INT32,            // int32_t
     TYPE_ANY,            // Wildcard for find_node
     TYPE_END = TYPE_ANY    // Terminator for prefs_desc list
 } prefs_type;
@@ -75,28 +76,28 @@ extern void AddPlatformPrefsDefaults();
 extern void AddKeyboardPrefsDefaults();
 
 // Preferences loading/saving
-extern void LoadPrefs();
-extern void SavePrefs();
+//extern void LoadPrefs();
+//extern void SavePrefs();
 extern void LoadPrefs(const char *path, bool create);
 extern void SavePrefs(const char *path);
 
 // Public preferences access functions
 extern void PrefsAddString(const char *name, const char *s);
 extern void PrefsAddBool(const char *name, bool b);
-extern void PrefsAddInt32(const char *name, int32 val);
+extern void PrefsAddInt32(const char *name, int32_t val);
 
 extern void PrefsReplaceString(const char *name, const char *s, int index);
 extern void PrefsReplaceBool(const char *name, bool b);
-extern void PrefsReplaceInt32(const char *name, int32 val);
+extern void PrefsReplaceInt32(const char *name, int32_t val);
 
 extern const char *PrefsFindString(const char *name, int index);
 extern bool PrefsFindBool(const char *name);
-extern int32 PrefsFindInt32(const char *name);
+extern int32_t PrefsFindInt32(const char *name);
 
 extern void PrefsRemoveItem(const char *name, int index);
 
 extern void PrefsSetCallbackString(const char *name, prefs_func_string f);
 extern void PrefsSetCallbackBool(const char *name, prefs_func_bool f);
-extern void PrefsSetCallbackInt32(const char *name, prefs_func_int32 f);
+extern void PrefsSetCallbackInt32(const char *name, prefs_func_int32_t f);
 
 #endif

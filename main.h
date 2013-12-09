@@ -21,7 +21,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "types.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 
 /*
@@ -29,7 +30,7 @@
  */
 
 // C64 replay routine address (set by UpdatePlayAdr(), used by sid.cpp)
-extern uint16 play_adr;
+extern uint16_t play_adr;
 
 // Module name, author name, copyright info in ISO Latin1 (BeOS: UTF8) charset (set by LoadPSIDFile())
 extern char module_name[64], author_name[64], copyright_info[64];
@@ -49,10 +50,10 @@ extern void InitAll(int argc, char **argv);
 extern void ExitAll();
 
 // Read PSID file header to buffer
-extern bool LoadPSIDHeader(const char *file, uint8 *p);
+extern bool LoadPSIDHeader(const char *file, uint8_t *p);
 
 // Check for PSID header
-extern bool IsPSIDHeader(const uint8 *p);
+extern bool IsPSIDHeader(const uint8_t *p);
 
 // Check whether file is a PSID file
 extern bool IsPSIDFile(const char *file);
@@ -76,9 +77,9 @@ extern void AdjustSpeed(int percent);
 extern void AboutWindow();
 
 // Fast pseudo-random number generator
-extern uint32 f_rand_seed;
+extern uint32_t f_rand_seed;
 
-inline static uint8 f_rand()
+inline static uint8_t f_rand()
 {
     f_rand_seed = f_rand_seed * 1103515245 + 12345;
     return f_rand_seed >> 16;

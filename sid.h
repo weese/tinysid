@@ -21,7 +21,8 @@
 #ifndef SID_H
 #define SID_H
 
-#include "types.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 
 /*
@@ -35,10 +36,10 @@ extern void SIDInit();
 extern void SIDExit();
 
 // Reset SID emulation
-extern void SIDReset(cycle_t now);
+extern void SIDReset(uint32_t now);
 
 // Fill audio buffer with SID sound
-extern void SIDCalcBuffer(uint8 *buf, int count);
+extern void SIDCalcBuffer(uint8_t *buf, int count);
 
 // Execute 6510 replay routine once
 extern void SIDExecute();
@@ -48,13 +49,13 @@ extern void SIDSetReplayFreq(int freq);
 extern void SIDAdjustSpeed(int percent);
 
 // Write to CIA timer A (changes replay frequency)
-extern void cia_tl_write(uint8 byte);
-extern void cia_th_write(uint8 byte);
+extern void cia_tl_write(uint8_t byte);
+extern void cia_th_write(uint8_t byte);
 
 // Read from SID register
-extern uint32 sid_read(uint32 adr, cycle_t now);
+extern uint32_t sid_read(uint32_t adr, uint32_t now);
 
 // Write to SID register
-extern void sid_write(uint32 adr, uint32 byte, cycle_t now, bool rmw);
+extern void sid_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw);
 
 #endif

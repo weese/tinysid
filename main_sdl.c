@@ -41,7 +41,7 @@
  *  Get current value of microsecond timer
  */
 
-uint64 GetTicks_usec()
+uint64_t GetTicks_usec()
 {
 #ifdef __unix__
     struct timeval t;
@@ -58,12 +58,12 @@ uint64 GetTicks_usec()
  *  (adapted from SDL_Delay() source)
  */
 
-void Delay_usec(uint32 usec)
+void Delay_usec(uint32_t usec)
 {
 #ifdef __unix__
     int was_error;
 #ifndef __linux__    /* Non-Linux implementations need to calculate time left */
-    uint64 then, now, elapsed;
+    uint64_t then, now, elapsed;
 #endif
     struct timeval tv;
 
@@ -133,7 +133,7 @@ int main(int argc, char **argv)
     }
     atexit(quit);
     InitAll(argc, argv);
-    int32 speed = PrefsFindInt32("speed");
+    int32_t speed = PrefsFindInt32("speed");
 
     // Parse non-option arguments
     const char *file_name = NULL;

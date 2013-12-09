@@ -21,8 +21,7 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include "types.h"
-
+#include <stdint.h>
 
 /*
  *  Functions
@@ -35,6 +34,6 @@ extern void CPUInit();
 extern void CPUExit();
 
 // CPU emulation loop
-extern void CPUExecute(uint16 startadr, uint8 init_ra, uint8 init_rx, uint8 init_ry, cycle_t max_cycles);
+extern void CPUExecute(uint16_t startadr, uint8_t init_ra, uint8_t init_rx, uint8_t init_ry, uint32_t max_cycles);
 
 #endif

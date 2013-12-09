@@ -21,12 +21,12 @@
 #ifndef SYS_H
 #define SYS_H
 
-#include "types.h"
+#include <stdint.h>
 
-#include <SDL.h>
+//#include <SDL.h>
 
 // Microsecond-resolution timing functions
-extern uint64 GetTicks_usec();
-extern void Delay_usec(uint32 usec);
+extern uint64_t GetTicks_usec();
+extern void Delay_usec(uint32_t usec);
 
 #endif

@@ -321,10 +321,10 @@
 // Branch operation
 #define branch(flag) \
 { \
-    int8 tmp = read_opcode; inc_pc; next_cycle; \
+    int8_t tmp = read_opcode; inc_pc; next_cycle; \
     if (flag) { \
         /* Branch taken */ \
-        ADR = RPC + (int8)tmp; \
+        ADR = RPC + (int8_t)tmp; \
         if ((ADR ^ RPC) & 0xff00) { \
             /* Page crossed */ \
             read_idle_opcode; next_cycle; \

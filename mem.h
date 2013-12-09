@@ -21,7 +21,7 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include "types.h"
+#include <stdint.h>
 
 
 /*
@@ -32,7 +32,7 @@
 #define RAM_SIZE ((const int) 0x10000)
 
 // Memory area
-extern uint8 ram[RAM_SIZE];
+extern uint8_t ram[RAM_SIZE];
 
 
 /*

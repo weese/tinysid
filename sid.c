@@ -79,17 +79,17 @@ static int32 v1_panning, v2_panning, v3_panning, v4_panning;
 static int32 dual_sep;
 
 // Number of SID clocks per sample frame
-static uint32 sid_cycles;        // Integer
+static uint32_t sid_cycles;        // Integer
 static fp24p8_t sid_cycles_frac;    // With fractional part
 
 // Phi2 clock frequency
-static cycle_t cycles_per_second;
+static uint32_t cycles_per_second;
 const fp24p8_t PAL_CLOCK = ftofp24p8(985248.444);
 const fp24p8_t NTSC_OLD_CLOCK = ftofp24p8(1000000.0);
 const fp24p8_t NTSC_CLOCK = ftofp24p8(1022727.143);
 
 // Replay counter variables
-static uint16 cia_timer;        // CIA timer A latch
+static uint16_t cia_timer;        // CIA timer A latch
 static int replay_count;        // Counter for timing replay routine
 static int speed_adjust;        // Speed adjustment in percent
 
@@ -112,9 +112,9 @@ static inline ufp16p16_t CALC_RESONANCE_HP(float f)
 // Pseudo-random number generator for SID noise waveform (don't use f_rand()
 // because the SID waveform calculation runs asynchronously and the output of
 // f_rand() has to be predictable inside the main emulation)
-static uint32 noise_rand_seed = 1;
+static uint32_t noise_rand_seed = 1;
 
-inline static uint8 noise_rand()
+inline static uint8_t noise_rand()
 {
     // This is not the original SID noise algorithm (which is unefficient to
     // implement in software) but this sounds close enough
@@ -170,22 +170,22 @@ struct voice_t {
     voice_t *mod_by;    // Voice that modulates this one
     voice_t *mod_to;    // Voice that is modulated by this one
 
-    uint32 count;        // Counter for waveform generator, 8.16 fixed
-    uint32 add;            // Added to counter in every sample frame
+    uint32_t count;        // Counter for waveform generator, 8.16 fixed
+    uint32_t add;            // Added to counter in every sample frame
 
-    uint16 freq;        // SID frequency value
-    uint16 pw;            // SID pulse-width value
+    uint16_t freq;        // SID frequency value
+    uint16_t pw;            // SID pulse-width value
 
-    uint32 a_add;        // EG parameters
-    uint32 d_sub;
-    uint32 s_level;
-    uint32 r_sub;
-    uint32 eg_level;    // Current EG level, 8.16 fixed
+    uint32_t a_add;        // EG parameters
+    uint32_t d_sub;
+    uint32_t s_level;
+    uint32_t r_sub;
+    uint32_t eg_level;    // Current EG level, 8.16 fixed
 
-    uint32 noise;        // Last noise generator output value
+    uint32_t noise;        // Last noise generator output value
 
-    uint16 left_gain;    // Gain on left channel (12.4 fixed)
-    uint16 right_gain;    // Gain on right channel (12.4 fixed)
+    uint16_t left_gain;    // Gain on left channel (12.4 fixed)
+    uint16_t right_gain;    // Gain on right channel (12.4 fixed)
 
     bool gate;            // EG gate bit
     bool ring;            // Ring modulation bit
@@ -205,62 +205,60 @@ struct osid_t {
 
     voice_t voice[3];                    // Data for 3 voices
 
-    uint8 regs[128];                    // Copies of the 25 write-only SID registers (SIDPlayer uses 128 registers)
-    uint8 last_written_byte;            // Byte last written to SID (for emulation of read accesses to write-only registers)
-    uint8 volume;                        // Master volume (0..15)
+    uint8_t regs[128];                    // Copies of the 25 write-only SID registers (SIDPlayer uses 128 registers)
+    uint8_t last_written_byte;            // Byte last written to SID (for emulation of read accesses to write-only registers)
+    uint8_t volume;                        // Master volume (0..15)
 
-    uint8 f_type;                        // Filter type
-    uint8 f_freq;                        // SID filter frequency (upper 8 bits)
-    uint8 f_res;                        // Filter resonance (0..15)
+    uint8_t f_type;                        // Filter type
+    uint8_t f_freq;                        // SID filter frequency (upper 8 bits)
+    uint8_t f_res;                        // Filter resonance (0..15)
 
     fp8p24_t f_ampl;                        // IIR filter input attenuation
     fp8p24_t d1, d2, g1, g2;                // IIR filter coefficients
     fp24p8_t xn1_l, xn2_l, yn1_l, yn2_l;    // IIR filter previous input/output signal (left and right channel)
     fp24p8_t xn1_r, xn2_r, yn1_r, yn2_r;
 
-    uint16 v4_left_gain;                // Gain of voice 4 on left channel (12.4 fixed)
-    uint16 v4_right_gain;                // Gain of voice 4 on right channel (12.4 fixed)
+    uint16_t v4_left_gain;                // Gain of voice 4 on left channel (12.4 fixed)
+    uint16_t v4_right_gain;                // Gain of voice 4 on right channel (12.4 fixed)
 
     int v4_state;                        // State of voice 4 (Galway noise/samples)
-    uint32 v4_count;                    // Counter for voice 4
-    uint32 v4_add;                        // Added to counter in every frame
+    uint32_t v4_count;                    // Counter for voice 4
+    uint32_t v4_add;                        // Added to counter in every frame
 
-    uint16 gn_adr;                        // C64 address of tone list
-    uint16 gn_tone_length;                // Length of each tone in samples
-    uint32 gn_volume_add;                // Added to SID volume reg. for every sample
+    uint16_t gn_adr;                        // C64 address of tone list
+    uint16_t gn_tone_length;                // Length of each tone in samples
+    uint32_t gn_volume_add;                // Added to SID volume reg. for every sample
     int    gn_tone_counter;                // Number of tones in list
-    uint16 gn_base_cycles;                // Cycles before sample
-    uint16 gn_loop_cycles;                // Cycles between samples
-    uint32 gn_last_count;                // Value of v4_count (lower 16 bits cleared) at end of tone
+    uint16_t gn_base_cycles;                // Cycles before sample
+    uint16_t gn_loop_cycles;                // Cycles between samples
+    uint32_t gn_last_count;                // Value of v4_count (lower 16 bits cleared) at end of tone
 
-    uint32 sm_adr;                        // C64 nybble address of sample
-    uint32 sm_end_adr;                    // C64 nybble address of end of sample
-    uint32 sm_rep_adr;                    // C64 nybble address of sample repeat point
-    uint16 sm_volume;                    // Sample volume (0..2, 0=loudest)
-    uint8 sm_rep_count;                    // Sample repeat counter (0xff=continous)
+    uint32_t sm_adr;                        // C64 nybble address of sample
+    uint32_t sm_end_adr;                    // C64 nybble address of end of sample
+    uint32_t sm_rep_adr;                    // C64 nybble address of sample repeat point
+    uint16_t sm_volume;                    // Sample volume (0..2, 0=loudest)
+    uint8_t sm_rep_count;                    // Sample repeat counter (0xff=continous)
     bool sm_big_endian;                    // Flag: Sample is big-endian
 };
 osid_t *sid1 = NULL, *sid2 = NULL;
 
 void osid_reset(osid_t *sid);
-uint32 osid_read(osid_t *sid, uint32 adr, cycle_t now);
-void osid_write(osid_t *sid, uint32 adr, uint32 byte, cycle_t now, bool rmw);
+uint32_t osid_read(osid_t *sid, uint32_t adr, uint32_t now);
+void osid_write(osid_t *sid, uint32_t adr, uint32_t byte, uint32_t now, bool rmw);
 void osid_calc_gains(osid_t *sid, bool is_left_sid, bool is_right_sid);
 void osid_calc_filter(osid_t *sid);
-void osid_chunk_read(osid_t *sid, size_t size);
-void osid_chunk_write(osid_t *sid);
 
-static void osid_calc_gain_voice(int32 volume, int32 panning, uint16 *left_gain, uint16 *right_gain);
+static void osid_calc_gain_voice(int32 volume, int32 panning, uint16_t *left_gain, uint16_t *right_gain);
 
 // Waveform tables
-static uint16 tri_table[0x1000*2];
-static const uint16 *tri_saw_table;
-static const uint16 *tri_rect_table;
-static const uint16 *saw_rect_table;
-static const uint16 *tri_saw_rect_table;
+static uint16_t tri_table[0x1000*2];
+static const uint16_t *tri_saw_table;
+static const uint16_t *tri_rect_table;
+static const uint16_t *saw_rect_table;
+static const uint16_t *tri_saw_rect_table;
 
 // Sampled from a 6581R4
-static const uint16 tri_saw_table_6581[0x100] = {
+static const uint16_t tri_saw_table_6581[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -279,7 +277,7 @@ static const uint16 tri_saw_table_6581[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x1010, 0x3C3C
 };
 
-static const uint16 tri_rect_table_6581[0x100] = {
+static const uint16_t tri_rect_table_6581[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -298,7 +296,7 @@ static const uint16 tri_rect_table_6581[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static const uint16 saw_rect_table_6581[0x100] = {
+static const uint16_t saw_rect_table_6581[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -317,7 +315,7 @@ static const uint16 saw_rect_table_6581[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x7878
 };
 
-static const uint16 tri_saw_rect_table_6581[0x100] = {
+static const uint16_t tri_saw_rect_table_6581[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -337,7 +335,7 @@ static const uint16 tri_saw_rect_table_6581[0x100] = {
 };
 
 // Sampled from an 8580R5
-static const uint16 tri_saw_table_8580[0x100] = {
+static const uint16_t tri_saw_table_8580[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -356,7 +354,7 @@ static const uint16 tri_saw_table_8580[0x100] = {
     0xC0C0, 0xC0C0, 0xC0C0, 0xC0C0, 0xC0C0, 0xC0C0, 0xC0C0, 0xE0E0, 0xF0F0, 0xF0F0, 0xF0F0, 0xF0F0, 0xF8F8, 0xF8F8, 0xFCFC, 0xFEFE
 };
 
-static const uint16 tri_rect_table_8580[0x100] = {
+static const uint16_t tri_rect_table_8580[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -375,7 +373,7 @@ static const uint16 tri_rect_table_8580[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
-static const uint16 saw_rect_table_8580[0x100] = {
+static const uint16_t saw_rect_table_8580[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -394,7 +392,7 @@ static const uint16 saw_rect_table_8580[0x100] = {
     0xC0C0, 0xE0E0, 0xE0E0, 0xE0E0, 0xE0E0, 0xF0F0, 0xF0F0, 0xF4F4, 0xF0F0, 0xF0F0, 0xF8F8, 0xF8F8, 0xF8F8, 0xFCFC, 0xFEFE, 0xFFFF
 };
 
-static const uint16 tri_saw_rect_table_8580[0x100] = {
+static const uint16_t tri_saw_rect_table_8580[0x100] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -414,9 +412,9 @@ static const uint16 tri_saw_rect_table_8580[0x100] = {
 };
 
 // Envelope tables
-static uint32 eg_table[16];
+static uint32_t eg_table[16];
 
-static const uint8 eg_dr_shift[256] = {
+static const uint8_t eg_dr_shift[256] = {
     5,5,5,5,5,5,5,5,4,4,4,4,4,4,4,4,
     3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,2,
     2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
@@ -460,7 +458,7 @@ static int wb_read_offset = 0, wb_write_offset = 0;
 static int rev_feedback = 0;
 
 // Prototypes
-static void calc_buffer(void *userdata, uint8 *buf, int count);
+static void calc_buffer(void *userdata, uint8_t *buf, int count);
 
 
 /*
@@ -827,7 +825,7 @@ void osid_reset(osid_t *sid)
     sid->sm_big_endian = false;
 }
 
-void SIDReset(cycle_t now)
+void SIDReset(uint32_t now)
 {
     SDL_LockAudio();
     osid_reset(sid1);
@@ -843,7 +841,7 @@ void SIDReset(cycle_t now)
  *  Clock overflow
  */
 
-void SIDClockOverflow(cycle_t sub)
+void SIDClockOverflow(uint32_t sub)
 {
 }
 
@@ -859,7 +857,7 @@ void SIDClockFreqChanged()
     sid_cycles_frac = divfp24p8(itofp24p8(cycles_per_second), itofp24p8(obtained.freq));
 
     // Compute envelope table
-    static const uint32 div[16] = {
+    static const uint32_t div[16] = {
         9, 32, 63, 95, 149, 220, 267, 313,
         392, 977, 1954, 3126, 3906, 11720, 19531, 31251
     };
@@ -899,12 +897,12 @@ void SIDAdjustSpeed(int percent)
  *  Write to CIA timer A (changes replay frequency)
  */
 
-void cia_tl_write(uint8 byte)
+void cia_tl_write(uint8_t byte)
 {
     cia_timer = (cia_timer & 0xff00) | byte;
 }
 
-void cia_th_write(uint8 byte)
+void cia_th_write(uint8_t byte)
 {
     cia_timer = (cia_timer & 0x00ff) | (byte << 8);
 }
@@ -918,10 +916,10 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
 {
     // Sampled voice (!! todo: gain/panning)
 #if 0    //!!
-    uint8 master_volume = sid->sample_buf[(sample_count >> 16) % SAMPLE_BUF_SIZE];
+    uint8_t master_volume = sid->sample_buf[(sample_count >> 16) % SAMPLE_BUF_SIZE];
     sample_count += ((0x138 * 50) << 16) / obtained.freq;
 #else
-    uint8 master_volume = sid->volume;
+    uint8_t master_volume = sid->volume;
 #endif
 
     int32 sum_output_filter_left = 0, sum_output_filter_right = 0;
@@ -932,7 +930,7 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
         voice_t *v = sid->voice + j;
 
         // Envelope generator
-        uint16 envelope;
+        uint16_t envelope;
 
         switch (v->eg_state) {
             case EG_ATTACK:
@@ -965,7 +963,7 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
         envelope = (v->eg_level * master_volume) >> 20;
 
         // Waveform generator
-        uint16 output;
+        uint16_t output;
 
         if (!v->test)
             v->count += v->add;
@@ -986,7 +984,7 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
                 output = v->count >> 8;
                 break;
             case WAVE_RECT:
-                if (v->count > (uint32)(v->pw << 12))
+                if (v->count > (uint32_t)(v->pw << 12))
                     output = 0xffff;
                 else
                     output = 0;
@@ -995,19 +993,19 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
                 output = tri_saw_table[v->count >> 16];
                 break;
             case WAVE_TRIRECT:
-                if (v->count > (uint32)(v->pw << 12))
+                if (v->count > (uint32_t)(v->pw << 12))
                     output = tri_rect_table[v->count >> 16];
                 else
                     output = 0;
                 break;
             case WAVE_SAWRECT:
-                if (v->count > (uint32)(v->pw << 12))
+                if (v->count > (uint32_t)(v->pw << 12))
                     output = saw_rect_table[v->count >> 16];
                 else
                     output = 0;
                 break;
             case WAVE_TRISAWRECT:
-                if (v->count > (uint32)(v->pw << 12))
+                if (v->count > (uint32_t)(v->pw << 12))
                     output = tri_saw_rect_table[v->count >> 16];
                 else
                     output = 0;
@@ -1056,7 +1054,7 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
             break;
 
         case V4_SAMPLE: {
-            uint8 sample = ram[sid->sm_adr >> 1];
+            uint8_t sample = ram[sid->sm_adr >> 1];
             if (sid->sm_big_endian)
                 if (sid->sm_adr & 1)
                     sample = sample & 0xf;
@@ -1107,9 +1105,9 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
     *sum_output_right += sum_output_filter_right;
 }
 
-static void calc_buffer(void *userdata, uint8 *buf, int count)
+static void calc_buffer(void *userdata, uint8_t *buf, int count)
 {
-    uint16 *buf16 = (uint16 *)buf;
+    uint16_t *buf16 = (uint16_t *)buf;
 
     int replay_limit = (obtained.freq * 100) / (cycles_per_second / (cia_timer + 1) * speed_adjust);
 
@@ -1186,23 +1184,23 @@ static void calc_buffer(void *userdata, uint8 *buf, int count)
     }
 }
 
-void SIDCalcBuffer(uint8 *buf, int count)
+void SIDCalcBuffer(uint8_t *buf, int count)
 {
     calc_buffer(NULL, buf, count);
 }
 
-uint64 replay_start_time = 0;    // Start time of last replay
+uint64_t replay_start_time = 0;    // Start time of last replay
 int32 over_time = 0;            // Time the last replay was too long
 
 void SIDExecute()
 {
     // Delay to maintain proper replay frequency
-    uint64 now = GetTicks_usec();
+    uint64_t now = GetTicks_usec();
     if (replay_start_time == 0)
         replay_start_time = now;
-    uint32 replay_time = now - replay_start_time;
-    //uint32 adj_nominal_replay_time = (uint32) ((cia_timer + 1) * 100000000.0 / (cycles_per_second * speed_adjust));
-    uint32 adj_nominal_replay_time = (cia_timer + 1) * 100000000 / (cycles_per_second * speed_adjust);
+    uint32_t replay_time = now - replay_start_time;
+    //uint32_t adj_nominal_replay_time = (uint32_t) ((cia_timer + 1) * 100000000.0 / (cycles_per_second * speed_adjust));
+    uint32_t adj_nominal_replay_time = (cia_timer + 1) * 100000000 / (cycles_per_second * speed_adjust);
     int32 delay = adj_nominal_replay_time - replay_time - over_time;
     over_time = -delay;
     if (over_time < 0)
@@ -1341,7 +1339,7 @@ void osid_calc_filter(osid_t *sid)
  *  Calculate gain values for all voices
  */
 
-static void osid_calc_gain_voice(int32 volume, int32 panning, uint16 *left_gain, uint16 *right_gain)
+static void osid_calc_gain_voice(int32 volume, int32 panning, uint16_t *left_gain, uint16_t *right_gain)
 {
     int gain;
     if (panning < -0x100)
@@ -1380,7 +1378,7 @@ void osid_calc_gains(osid_t *sid, bool is_left_sid, bool is_right_sid)
  *  Read from SID register
  */
 
-uint32 osid_read(osid_t *sid, uint32 adr, cycle_t now)
+uint32_t osid_read(osid_t *sid, uint32_t adr, uint32_t now)
 {
     D(bug("sid_read from %04x at cycle %d\n", adr, now));
 
@@ -1394,14 +1392,14 @@ uint32 osid_read(osid_t *sid, uint32 adr, cycle_t now)
             sid->last_written_byte = 0;
             return f_rand();
         default: {    // Write-only register: return last value written to SID
-            uint8 ret = sid->last_written_byte;
+            uint8_t ret = sid->last_written_byte;
             sid->last_written_byte = 0;
             return ret;
         }
     }
 }
 
-uint32 sid_read(uint32 adr, cycle_t now)
+uint32_t sid_read(uint32_t adr, uint32_t now)
 {
     return osid_read(sid1, adr & 0x7f, now);
 }
@@ -1411,7 +1409,7 @@ uint32 sid_read(uint32 adr, cycle_t now)
  *  Write to SID register
  */
 
-void osid_write(osid_t *sid, uint32 adr, uint32 byte, cycle_t now, bool rmw)
+void osid_write(osid_t *sid, uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
     D(bug("sid_write %02x to %04x at cycle %d\n", byte, adr, now));
 
@@ -1427,7 +1425,7 @@ void osid_write(osid_t *sid, uint32 adr, uint32 byte, cycle_t now, bool rmw)
         case 7:
         case 14:
             sid->voice[v].freq = (sid->voice[v].freq & 0xff00) | byte;
-            //sid->voice[v].add = (uint32) ((float) sid->voice[v].freq) * sid_cycles_frac;
+            //sid->voice[v].add = (uint32_t) ((float) sid->voice[v].freq) * sid_cycles_frac;
             sid->voice[v].add = fp24p8toi(mulfp24p8(itofp24p8(sid->voice[v].freq), sid_cycles_frac));
             break;
 
@@ -1435,7 +1433,7 @@ void osid_write(osid_t *sid, uint32 adr, uint32 byte, cycle_t now, bool rmw)
         case 8:
         case 15:
             sid->voice[v].freq = (sid->voice[v].freq & 0xff) | (byte << 8);
-            //sid->voice[v].add = (uint32) ((float) sid->voice[v].freq) * sid_cycles_frac;
+            //sid->voice[v].add = (uint32_t) ((float) sid->voice[v].freq) * sid_cycles_frac;
             sid->voice[v].add = fp24p8toi(mulfp24p8(itofp24p8(sid->voice[v].freq), sid_cycles_frac));
             break;
 
@@ -1568,7 +1566,7 @@ void osid_write(osid_t *sid, uint32 adr, uint32 byte, cycle_t now, bool rmw)
     }
 }
 
-void sid_write(uint32 adr, uint32 byte, cycle_t now, bool rmw)
+void sid_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
     SDL_LockAudio();
     osid_write(sid1, adr & 0x7f, byte, now, rmw);

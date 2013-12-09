@@ -28,24 +28,24 @@
 
 
 // Memory access functions
-typedef uint32 (*mem_read_func)(uint32, cycle_t);
-typedef void (*mem_write_func)(uint32, uint32, cycle_t, bool);
+typedef uint32_t (*mem_read_func)(uint32_t, uint32_t);
+typedef void (*mem_write_func)(uint32_t, uint32_t, uint32_t, bool);
 
 static mem_read_func mem_read_table[256];       // Table of read/write functions for 256 pages
 static mem_write_func mem_write_table[256];
 
 
 // Memory access function prototypes
-static uint32 ram_read(uint32 adr, cycle_t now);
-static void ram_write(uint32 adr, uint32 byte, cycle_t now, bool rmw);
-static void cia_write(uint32 adr, uint32 byte, cycle_t now, bool rmw);
+static uint32_t ram_read(uint32_t adr, uint32_t now);
+static void ram_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw);
+static void cia_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw);
 
 
 /*
  *  Init CPU emulation
  */
 
-static void set_memory_funcs(uint16 from, uint16 to, mem_read_func r, mem_write_func w)
+static void set_memory_funcs(uint16_t from, uint16_t to, mem_read_func r, mem_write_func w)
 {
         int page;
     for (page = (from >> 8); page <= (to >> 8); page++) {
@@ -76,17 +76,17 @@ void CPUExit()
  *  Memory access functions
  */
 
-static uint32 ram_read(uint32 adr, cycle_t now)
+static uint32_t ram_read(uint32_t adr, uint32_t now)
 {
     return ram[adr];
 }
 
-static void ram_write(uint32 adr, uint32 byte, cycle_t now, bool rmw)
+static void ram_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
     ram[adr] = byte;
 }
 
-static void cia_write(uint32 adr, uint32 byte, cycle_t now, bool rmw)
+static void cia_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
     if (adr == 0xdc04)
         cia_tl_write(byte);
@@ -101,21 +101,21 @@ static void cia_write(uint32 adr, uint32 byte, cycle_t now, bool rmw)
  *  CPU emulation loop
  */
 
-void CPUExecute(uint16 startadr, uint8 init_ra, uint8 init_rx, uint8 init_ry, cycle_t max_cycles)
+void CPUExecute(uint16_t startadr, uint8_t init_ra, uint8_t init_rx, uint8_t init_ry, uint32_t max_cycles)
 {
     // 6510 registers
-    register uint8 a = init_ra, x = init_rx, y = init_ry;
-    register uint8 n_flag = 0, z_flag = 0;
-    uint8 sp = 0xff, pflags = 0;
+    register uint8_t a = init_ra, x = init_rx, y = init_ry;
+    register uint8_t n_flag = 0, z_flag = 0;
+    uint8_t sp = 0xff, pflags = 0;
 
     // Program counter
-    register uint8 *pc;
+    register uint8_t *pc;
 
     // Temporary address storage
-    uint16 adr;
+    uint16_t adr;
 
     // Phi 2 cycle counter
-    register cycle_t current_cycle = 0;
+    register uint32_t current_cycle = 0;
 
 #define RA a
 #define RX x
@@ -174,7 +174,7 @@ void CPUExecute(uint16 startadr, uint8 init_ra, uint8 init_rx, uint8 init_ry, cy
     while (current_cycle < max_cycles && !quit) {
 
         // Fetch opcode
-        uint8 opcode = read_opcode; inc_pc; next_cycle;
+        uint8_t opcode = read_opcode; inc_pc; next_cycle;
 
         // Execute opcode
         switch (opcode) {

@@ -32,7 +32,7 @@
 
 
 // Global variables
-uint32 f_rand_seed = 1;
+uint32_t f_rand_seed = 1;
 int number_of_songs, current_song;
 char module_name[64];
 char author_name[64];
@@ -42,10 +42,10 @@ char copyright_info[64];
 static bool psid_loaded = false;
 
 // Data from PSID header
-static uint16 init_adr;                // C64 init routine address
-uint16 play_adr;                    // C64 replay routine address
+static uint16_t init_adr;                // C64 init routine address
+uint16_t play_adr;                    // C64 replay routine address
 static bool play_adr_from_irq_vec;    // Flag: dynamically update play_adr from IRQ vector ($0314/$0315 or $fffe/$ffff)
-static uint32 speed_flags;            // Speed flags (1 bit/song)
+static uint32_t speed_flags;            // Speed flags (1 bit/song)
 
 
 
@@ -79,7 +79,7 @@ void ExitAll()
  *  Read PSID file header to buffer
  */
 
-bool LoadPSIDHeader(const char *file, uint8 *p)
+bool LoadPSIDHeader(const char *file, uint8_t *p)
 {
     // Read header
     memset(p, 0, PSID_MAX_HEADER_LENGTH);
@@ -96,11 +96,11 @@ bool LoadPSIDHeader(const char *file, uint8 *p)
  *  Check for PSID header
  */
 
-bool IsPSIDHeader(const uint8 *p)
+bool IsPSIDHeader(const uint8_t *p)
 {
     // Check signature and version
-    uint32 id = read_psid_32(p, PSID_ID);
-    uint16 version = read_psid_16(p, PSID_VERSION);
+    uint32_t id = read_psid_32(p, PSID_ID);
+    uint16_t version = read_psid_16(p, PSID_VERSION);
     return id == 0x50534944 && (version == 1 || version == 2);
 }
 
@@ -112,7 +112,7 @@ bool IsPSIDHeader(const uint8 *p)
 bool IsPSIDFile(const char *file)
 {
     // Load header
-    uint8 header[PSID_MAX_HEADER_LENGTH];
+    uint8_t header[PSID_MAX_HEADER_LENGTH];
     if (!LoadPSIDHeader(file, header))
         return false;
 
@@ -137,7 +137,7 @@ bool LoadPSIDFile(const char *file)
     psid_loaded = false;
 
     // Load and check header
-    uint8 header[PSID_MAX_HEADER_LENGTH];
+    uint8_t header[PSID_MAX_HEADER_LENGTH];
     memset(header, 0, PSID_MAX_HEADER_LENGTH);
     size_t actual = fread(header, 1, PSID_MAX_HEADER_LENGTH, f);
     if (actual < PSID_MIN_HEADER_LENGTH || !IsPSIDHeader(header)) {
@@ -172,10 +172,10 @@ bool LoadPSIDFile(const char *file)
     fseek(f, read_psid_16(header, PSID_LENGTH), SEEK_SET);
 
     // Find load address
-    uint16 load_adr = read_psid_16(header, PSID_START);
+    uint16_t load_adr = read_psid_16(header, PSID_START);
     if (load_adr == 0) {    // Load address is at start of module data
-        uint8 lo = fgetc(f);
-        uint8 hi = fgetc(f);
+        uint8_t lo = fgetc(f);
+        uint8_t hi = fgetc(f);
         load_adr = (hi << 8) | lo;
     }
     if (init_adr == 0)        // Init routine address is equal to load address

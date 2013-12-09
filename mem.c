@@ -30,7 +30,7 @@
 
 
 // Memory area
-uint8 ram[RAM_SIZE];
+uint8_t ram[RAM_SIZE];
 
 
 /*
