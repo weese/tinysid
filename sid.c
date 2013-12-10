@@ -1382,6 +1382,7 @@ void osid_calc_gains(osid_t *sid, bool is_left_sid, bool is_right_sid)
 
 uint32_t osid_read(osid_t *sid, uint32_t adr, uint32_t now)
 {
+    printf("?");
     D(bug("sid_read from %04x at cycle %d\n", adr, now));
 
     switch (adr) {
@@ -1413,6 +1414,7 @@ uint32_t sid_read(uint32_t adr, uint32_t now)
 
 void osid_write(osid_t *sid, uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
+    printf("sid_write %02x to %04x at cycle %d\n", byte, adr, now);
     D(bug("sid_write %02x to %04x at cycle %d\n", byte, adr, now));
 
     // Writing to standard SID mirrored registers
