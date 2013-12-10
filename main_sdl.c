@@ -27,10 +27,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#ifdef __unix__
 #include <unistd.h>
 #include <sys/time.h>
-#endif
 
 #include "main.h"
 #include "prefs.h"
@@ -43,13 +41,9 @@
 
 uint64_t GetTicks_usec()
 {
-#ifdef __unix__
     struct timeval t;
     gettimeofday(&t, NULL);
     return t.tv_sec * 1000000 + t.tv_usec;
-#else
-    return SDL_GetTicks() * 1000;
-#endif
 }
 
 
@@ -60,7 +54,6 @@ uint64_t GetTicks_usec()
 
 void Delay_usec(uint32_t usec)
 {
-#ifdef __unix__
     int was_error;
 #ifndef __linux__    /* Non-Linux implementations need to calculate time left */
     uint64_t then, now, elapsed;
@@ -90,9 +83,6 @@ void Delay_usec(uint32_t usec)
 #endif
         was_error = select(0, NULL, NULL, NULL, &tv);
     } while (was_error && (errno == EINTR));
-#else
-    SDL_Delay(usec / 1000);
-#endif
 }
 
 
@@ -140,6 +130,8 @@ int main(int argc, char **argv)
     int song = 0;
         int i;
     for (i=1; i<argc; i++) {
+		if (argv[i] == NULL)
+			break;
         if (strcmp(argv[i], "--help") == 0)
             usage(argv[0]);
         else if (argv[i][0] == '-') {
@@ -176,16 +168,16 @@ int main(int argc, char **argv)
     printf("Copyright  : %s\n\n", copyright_info);
     printf("Playing song %d/%d\n", current_song + 1, number_of_songs);
 
-    // Start replay and enter main loop
-    SDL_PauseAudio(false);
-    while (true) {
-        SDL_Event e;
-        if (SDL_WaitEvent(&e)) {
-            if (e.type == SDL_QUIT)
-                break;
-        }
-    }
-
-    ExitAll();
+//    // Start replay and enter main loop
+//    SDL_PauseAudio(false);
+//    while (true) {
+//        SDL_Event e;
+//        if (SDL_WaitEvent(&e)) {
+//            if (e.type == SDL_QUIT)
+//                break;
+//        }
+//    }
+//
+//    ExitAll();
     return 0;
 }

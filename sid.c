@@ -25,6 +25,8 @@
 #include <string.h>
 #include <math.h>
 
+#include <SDL.h>
+
 #include "sid.h"
 #include "main.h"
 #include "prefs.h"
@@ -69,14 +71,14 @@ static bool emulate_8580 = false;
 static int audio_effect = 0;
 
 // Master volume (0..0x100)
-static int32 master_volume;
+static int32_t master_volume;
 
 // Volumes (0..0x100) and panning (-0x100..0x100) of voices 1..4 (both SIDs)
-static int32 v1_volume, v2_volume, v3_volume, v4_volume;
-static int32 v1_panning, v2_panning, v3_panning, v4_panning;
+static int32_t v1_volume, v2_volume, v3_volume, v4_volume;
+static int32_t v1_panning, v2_panning, v3_panning, v4_panning;
 
 // Dual-SID stereo separation (0..0x100)
-static int32 dual_sep;
+static int32_t dual_sep;
 
 // Number of SID clocks per sample frame
 static uint32_t sid_cycles;        // Integer
@@ -248,7 +250,7 @@ void osid_write(osid_t *sid, uint32_t adr, uint32_t byte, uint32_t now, bool rmw
 void osid_calc_gains(osid_t *sid, bool is_left_sid, bool is_right_sid);
 void osid_calc_filter(osid_t *sid);
 
-static void osid_calc_gain_voice(int32 volume, int32 panning, uint16_t *left_gain, uint16_t *right_gain);
+static void osid_calc_gain_voice(int32_t volume, int32_t panning, uint16_t *left_gain, uint16_t *right_gain);
 
 // Waveform tables
 static uint16_t tri_table[0x1000*2];
@@ -438,7 +440,7 @@ static fp16p16_t ffreq_lp[256];    // Low-pass resonance frequency table
 static fp16p16_t ffreq_hp[256];    // High-pass resonance frequency table
 
 // Table for sampled voices
-static const int16 sample_tab[16 * 3] = {
+static const int16_t sample_tab[16 * 3] = {
     0x8000, 0x9111, 0xa222, 0xb333, 0xc444, 0xd555, 0xe666, 0xf777,
     0x0888, 0x1999, 0x2aaa, 0x3bbb, 0x4ccc, 0x5ddd, 0x6eee, 0x7fff,
 
@@ -449,11 +451,11 @@ static const int16 sample_tab[16 * 3] = {
     0x0888, 0x0888, 0x0888, 0x0888, 0x1999, 0x1999, 0x1999, 0x1999
 };
 
-static int16 galway_tab[16 * 64];
+static int16_t galway_tab[16 * 64];
 
 // Work buffer and variables for audio effects
 #define WORK_BUFFER_SIZE 0x10000
-static int16 work_buffer[WORK_BUFFER_SIZE];
+static int16_t work_buffer[WORK_BUFFER_SIZE];
 static int wb_read_offset = 0, wb_write_offset = 0;
 static int rev_feedback = 0;
 
@@ -480,13 +482,13 @@ void osid_init(osid_t *sid, int n)
     osid_reset(sid);
 }
 
-static void set_desired_samples(int32 sample_rate)
+static void set_desired_samples(int32_t sample_rate)
 {
     // Music replay doesn't need low latency
     desired.samples *= 8;
 }
 
-static void set_rev_delay(int32 delay_ms)
+static void set_rev_delay(int32_t delay_ms)
 {
     int delay = (delay_ms * obtained.freq / 1000) & ~1;
     if (delay == 0)
@@ -524,7 +526,7 @@ static void prefs_sidtype_changed(const char *name, const char *from, const char
     set_sid_data();
 }
 
-static void prefs_samplerate_changed(const char *name, int32 from, int32 to)
+static void prefs_samplerate_changed(const char *name, int32_t from, int32_t to)
 {
     SDL_CloseAudio();
     desired.freq = obtained.freq = to;
@@ -572,78 +574,78 @@ static void prefs_dualsid_changed(const char *name, bool from, bool to)
     SDL_UnlockAudio();
 }
 
-static void prefs_audioeffect_changed(const char *name, int32 from, int32 to)
+static void prefs_audioeffect_changed(const char *name, int32_t from, int32_t to)
 {
     if (to)
         memset(work_buffer, 0, sizeof(work_buffer));
     audio_effect = to;
 }
 
-static void prefs_revdelay_changed(const char *name, int32 from, int32 to)
+static void prefs_revdelay_changed(const char *name, int32_t from, int32_t to)
 {
     set_rev_delay(to);
 }
 
-static void prefs_revfeedback_changed(const char *name, int32 from, int32 to)
+static void prefs_revfeedback_changed(const char *name, int32_t from, int32_t to)
 {
     rev_feedback = to;
 }
 
-static void prefs_volume_changed(const char *name, int32 from, int32 to)
+static void prefs_volume_changed(const char *name, int32_t from, int32_t to)
 {
     master_volume = to;
     calc_gains();
 }
 
-static void prefs_v1volume_changed(const char *name, int32 from, int32 to)
+static void prefs_v1volume_changed(const char *name, int32_t from, int32_t to)
 {
     v1_volume = to;
     calc_gains();
 }
 
-static void prefs_v2volume_changed(const char *name, int32 from, int32 to)
+static void prefs_v2volume_changed(const char *name, int32_t from, int32_t to)
 {
     v2_volume = to;
     calc_gains();
 }
 
-static void prefs_v3volume_changed(const char *name, int32 from, int32 to)
+static void prefs_v3volume_changed(const char *name, int32_t from, int32_t to)
 {
     v3_volume = to;
     calc_gains();
 }
 
-static void prefs_v4volume_changed(const char *name, int32 from, int32 to)
+static void prefs_v4volume_changed(const char *name, int32_t from, int32_t to)
 {
     v4_volume = to;
     calc_gains();
 }
 
-static void prefs_v1pan_changed(const char *name, int32 from, int32 to)
+static void prefs_v1pan_changed(const char *name, int32_t from, int32_t to)
 {
     v1_panning = to;
     calc_gains();
 }
 
-static void prefs_v2pan_changed(const char *name, int32 from, int32 to)
+static void prefs_v2pan_changed(const char *name, int32_t from, int32_t to)
 {
     v2_panning = to;
     calc_gains();
 }
 
-static void prefs_v3pan_changed(const char *name, int32 from, int32 to)
+static void prefs_v3pan_changed(const char *name, int32_t from, int32_t to)
 {
     v3_panning = to;
     calc_gains();
 }
 
-static void prefs_v4pan_changed(const char *name, int32 from, int32 to)
+static void prefs_v4pan_changed(const char *name, int32_t from, int32_t to)
 {
     v4_panning = to;
     calc_gains();
 }
 
-static void prefs_dualsep_changed(const char *name, int32 from, int32 to)
+static void prefs_dualsep_changed(const char *name, int32_t from, int32_t to)
 {
     dual_sep = to;
     calc_gains();
@@ -665,7 +667,7 @@ static void prefs_victype_changed(const char *name, const char *from, const char
     SIDClockFreqChanged();
 }
 
-static void prefs_speed_changed(const char *name, int32 from, int32 to)
+static void prefs_speed_changed(const char *name, int32_t from, int32_t to)
 {
     speed_adjust = to;
 }
@@ -912,7 +914,7 @@ void cia_th_write(uint8_t byte)
  *  Fill audio buffer with SID sound
  */
 
-static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_right)
+static void calc_sid(osid_t *sid, int32_t *sum_output_left, int32_t *sum_output_right)
 {
     // Sampled voice (!! todo: gain/panning)
 #if 0    //!!
@@ -922,7 +924,7 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
     uint8_t master_volume = sid->volume;
 #endif
 
-    int32 sum_output_filter_left = 0, sum_output_filter_right = 0;
+    int32_t sum_output_filter_left = 0, sum_output_filter_right = 0;
 
     // Loop for all three voices
     int j;
@@ -1021,7 +1023,7 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
                 output = 0x8000;
                 break;
         }
-        int32 x = (int16)(output ^ 0x8000) * envelope;
+        int32_t x = (int16_t)(output ^ 0x8000) * envelope;
         if (v->filter) {
             sum_output_filter_left += (x * v->left_gain) >> 4;
             sum_output_filter_right += (x * v->right_gain) >> 4;
@@ -1032,7 +1034,7 @@ static void calc_sid(osid_t *sid, int32 *sum_output_left, int32 *sum_output_righ
     }
 
     // Galway noise/samples
-    int32 v4_output = 0;
+    int32_t v4_output = 0;
     switch (sid->v4_state) {
 
         case V4_GALWAY_NOISE:
@@ -1121,7 +1123,7 @@ static void calc_buffer(void *userdata, uint8_t *buf, int count)
 
     // Main calculation loop
     while (count--) {
-        int32 sum_output_left = 0, sum_output_right = 0;
+        int32_t sum_output_left = 0, sum_output_right = 0;
 
         // Execute 6510 play routine if due
         if (++replay_count >= replay_limit) {
@@ -1190,7 +1192,7 @@ void SIDCalcBuffer(uint8_t *buf, int count)
 }
 
 uint64_t replay_start_time = 0;    // Start time of last replay
-int32 over_time = 0;            // Time the last replay was too long
+int32_t over_time = 0;            // Time the last replay was too long
 
 void SIDExecute()
 {
@@ -1201,13 +1203,13 @@ void SIDExecute()
     uint32_t replay_time = now - replay_start_time;
     //uint32_t adj_nominal_replay_time = (uint32_t) ((cia_timer + 1) * 100000000.0 / (cycles_per_second * speed_adjust));
     uint32_t adj_nominal_replay_time = (cia_timer + 1) * 100000000 / (cycles_per_second * speed_adjust);
-    int32 delay = adj_nominal_replay_time - replay_time - over_time;
+    int32_t delay = adj_nominal_replay_time - replay_time - over_time;
     over_time = -delay;
     if (over_time < 0)
         over_time = 0;
     if (delay > 0) {
         Delay_usec(delay);
-        int32 actual_delay = GetTicks_usec() - now;
+        int32_t actual_delay = GetTicks_usec() - now;
         if (actual_delay + 500 < delay)
             Delay_usec(1);
         actual_delay = GetTicks_usec() - now;
@@ -1339,7 +1341,7 @@ void osid_calc_filter(osid_t *sid)
  *  Calculate gain values for all voices
  */
 
-static void osid_calc_gain_voice(int32 volume, int32 panning, uint16_t *left_gain, uint16_t *right_gain)
+static void osid_calc_gain_voice(int32_t volume, int32_t panning, uint16_t *left_gain, uint16_t *right_gain)
 {
     int gain;
     if (panning < -0x100)
@@ -1362,7 +1364,7 @@ static void osid_calc_gain_voice(int32 volume, int32 panning, uint16_t *left_gai
 
 void osid_calc_gains(osid_t *sid, bool is_left_sid, bool is_right_sid)
 {
-    int32 pan_offset = 0;
+    int32_t pan_offset = 0;
     if (is_left_sid)
         pan_offset = -dual_sep;
     else if (is_right_sid)

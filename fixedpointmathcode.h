@@ -31,7 +31,7 @@ typedef int32_t fp8p24_t;
 
 /* unsigned */
 
-typedef uint16_t_t ufp8p8_t;
+typedef uint16_t ufp8p8_t;
 typedef uint32_t ufp24p8_t;
 typedef uint32_t ufp20p12_t;
 typedef uint32_t ufp16p16_t;
@@ -60,7 +60,7 @@ typedef uint32_t ufp8p24_t;
 #define _itofp20p12(x)  ( (int32_t)  (x) << 12 )
 #define _itofp16p16(x)  ( (int32_t)  (x) << 16 )
 #define _itofp8p24(x)   ( (int32_t)  (x) << 24 )
-#define _itoufp8p8(x)   ( (uint16_t_t) (x) << 8 )
+#define _itoufp8p8(x)   ( (uint16_t) (x) << 8 )
 #define _itoufp24p8(x)  ( (uint32_t) (x) << 8 )
 #define _itoufp20p12(x) ( (uint32_t) (x) << 12 )
 #define _itoufp16p16(x) ( (uint32_t) (x) << 16 )
@@ -200,10 +200,10 @@ typedef uint32_t ufp8p24_t;
 #define _mulfp16p16(x,y)  ( ( (int64_t)(x) *  (int64_t)(y)) >> 16 )
 #define _mulfp8p24(x,y)   ( ( (int64_t)(x) *  (int64_t)(y)) >> 24 )
 #define _mulufp8p8(x,y)   ( ((uint32_t)(x) * (uint32_t)(y)) >> 8  )
-#define _mulufp24p8(x,y)  ( ((uint64_t_t)(x) * (uint64_t)(y)) >> 8  )
-#define _mulufp20p12(x,y) ( ((uint64_t_t)(x) * (uint64_t)(y)) >> 12 )
-#define _mulufp16p16(x,y) ( ((uint64_t_t)(x) * (uint64_t)(y)) >> 16 )
-#define _mulufp8p24(x,y)  ( ((uint64_t_t)(x) * (uint64_t)(y)) >> 24 )
+#define _mulufp24p8(x,y)  ( ((uint64_t)(x) * (uint64_t)(y)) >> 8  )
+#define _mulufp20p12(x,y) ( ((uint64_t)(x) * (uint64_t)(y)) >> 12 )
+#define _mulufp16p16(x,y) ( ((uint64_t)(x) * (uint64_t)(y)) >> 16 )
+#define _mulufp8p24(x,y)  ( ((uint64_t)(x) * (uint64_t)(y)) >> 24 )
 
 /* division (x/y) */
 
@@ -213,10 +213,10 @@ typedef uint32_t ufp8p24_t;
 #define _divfp16p16(x,y)  ( ( (int64_t)(x) << 16) / (y) )
 #define _divfp8p24(x,y)   ( ( (int64_t)(x) << 24) / (y) )
 #define _divufp8p8(x,y)   ( ((uint32_t)(x) << 8 ) / (y) )
-#define _divufp24p8(x,y)  ( ((uint64_t_t)(x) << 8 ) / (y) )
-#define _divufp20p12(x,y) ( ((uint64_t_t)(x) << 12) / (y) )
-#define _divufp16p16(x,y) ( ((uint64_t_t)(x) << 16) / (y) )
-#define _divufp8p24(x,y)  ( ((uint64_t_t)(x) << 24) / (y) )
+#define _divufp24p8(x,y)  ( ((uint64_t)(x) << 8 ) / (y) )
+#define _divufp20p12(x,y) ( ((uint64_t)(x) << 12) / (y) )
+#define _divufp16p16(x,y) ( ((uint64_t)(x) << 16) / (y) )
+#define _divufp8p24(x,y)  ( ((uint64_t)(x) << 24) / (y) )
 
 /* ------------------------------------------------------------------------- */
 
@@ -229,7 +229,7 @@ typedef uint32_t ufp8p24_t;
  */
 
 #define _ualtb16(a,b)  ((((uint32_t)a-(uint32_t)b)>>31)&1)
-#define _ualtb32(a,b)  ((((uint64_t_t)a-(uint64_t)b)>>63)&1)
+#define _ualtb32(a,b)  ((((uint64_t)a-(uint64_t)b)>>63)&1)
 #define _uagtb16(a,b)  _ualtb16(b,a)
 #define _uagtb32(a,b)  _ualtb32(b,a)
 
@@ -408,7 +408,7 @@ static ufp8p24_t  _ufp8p24tmp unused,  _ufp8p24tmp2 unused,   _ufp8p24tmp3 unuse
 
 #define unused __attribute__((unused))
 static uint32_t _fp32_x2 unused,  _fp32_x3 unused,  _fp32_x4 unused,  _fp32_x5 unused,  _fp32_x6 unused;
-static uint64_t_t _fp64_x2 unused,  _fp64_x3 unused,  _fp64_x4 unused,  _fp64_x5 unused,  _fp64_x6 unused,
+static uint64_t _fp64_x2 unused,  _fp64_x3 unused,  _fp64_x4 unused,  _fp64_x5 unused,  _fp64_x6 unused,
                 _fp64_x7 unused,  _fp64_x8 unused,  _fp64_x9 unused,  _fp64_x10 unused, _fp64_x11 unused,
                 _fp64_x12 unused, _fp64_x13 unused, _fp64_x14 unused, _fp64_x15 unused, _fp64_x16 unused;
 #undef unused
@@ -439,7 +439,7 @@ static uint64_t_t _fp64_x2 unused,  _fp64_x3 unused,  _fp64_x4 unused,  _fp64_x5
                             _divufp8p8(_fp32_x6, 720<<8 ) \
                         : (1<<8)
 
-/* Same cheat for the next three macro's, but with uint64_t_t instead */
+/* Same cheat for the next three macro's, but with uint64_t instead */
 
 /* precision degrades after x = 9 or there about and overflows soon if x>15 */
 
@@ -466,15 +466,15 @@ static uint64_t_t _fp64_x2 unused,  _fp64_x3 unused,  _fp64_x4 unused,  _fp64_x5
                         _divufp24p8(_fp64_x5,  120<<8 )   + \
                         _divufp24p8(_fp64_x6,  720<<8 )   + \
                         _divufp24p8(_fp64_x7,  5040<<8 )  + \
-                        _divufp24p8(_fp64_x8,  (uint64_t_t) 40320<<8 )         +\
-                        _divufp24p8(_fp64_x9,  (uint64_t_t) 362880L<<8 )       +\
-                        _divufp24p8(_fp64_x10, (uint64_t_t) 3628800L<<8 )      +\
-                        _divufp24p8(_fp64_x11, (uint64_t_t) 39916800L<<8 )     +\
-                        _divufp24p8(_fp64_x12, (uint64_t_t) 479001600L<<8 )    +\
-                        _divufp24p8(_fp64_x13, (uint64_t_t) 6227020800LL<<8 )  +\
-                        _divufp24p8(_fp64_x14, (uint64_t_t) 87178291200LL<<8 ) +\
-                        _divufp24p8(_fp64_x15, (uint64_t_t) 1307674368000LL<<8)+\
-                        _divufp24p8(_fp64_x16, (uint64_t_t) 20922789888000LL<<8)\
+                        _divufp24p8(_fp64_x8,  (uint64_t) 40320<<8 )         +\
+                        _divufp24p8(_fp64_x9,  (uint64_t) 362880L<<8 )       +\
+                        _divufp24p8(_fp64_x10, (uint64_t) 3628800L<<8 )      +\
+                        _divufp24p8(_fp64_x11, (uint64_t) 39916800L<<8 )     +\
+                        _divufp24p8(_fp64_x12, (uint64_t) 479001600L<<8 )    +\
+                        _divufp24p8(_fp64_x13, (uint64_t) 6227020800LL<<8 )  +\
+                        _divufp24p8(_fp64_x14, (uint64_t) 87178291200LL<<8 ) +\
+                        _divufp24p8(_fp64_x15, (uint64_t) 1307674368000LL<<8)+\
+                        _divufp24p8(_fp64_x16, (uint64_t) 20922789888000LL<<8)\
                         : (1<<8)
 
 /* best precision-to-value ratio since it's well balanced */
@@ -496,9 +496,9 @@ static uint64_t_t _fp64_x2 unused,  _fp64_x3 unused,  _fp64_x4 unused,  _fp64_x5
                         _divufp16p16(_fp64_x5,  120<<16 )   + \
                         _divufp16p16(_fp64_x6,  720<<16 )   + \
                         _divufp16p16(_fp64_x7,  5040<<16 )  + \
-                        _divufp16p16(_fp64_x8,  (uint64_t_t) 40320<<16 )    + \
-                        _divufp16p16(_fp64_x9,  (uint64_t_t) 362880L<<16 )  + \
-                        _divufp16p16(_fp64_x10, (uint64_t_t) 3628800L<<16 )   \
+                        _divufp16p16(_fp64_x8,  (uint64_t) 40320<<16 )    + \
+                        _divufp16p16(_fp64_x9,  (uint64_t) 362880L<<16 )  + \
+                        _divufp16p16(_fp64_x10, (uint64_t) 3628800L<<16 )   \
                         : (1<<16)
 
 /* upper limit of x lowered compared to expfp8p8, so the precision of
@@ -519,7 +519,7 @@ static uint64_t_t _fp64_x2 unused,  _fp64_x3 unused,  _fp64_x4 unused,  _fp64_x5
                         _divufp8p24(_fp64_x5,  120<<24 )   + \
                         _divufp8p24(_fp64_x6,  720<<24 )   +  \
                         _divufp8p24(_fp64_x7,  5040<<24 )  + \
-                        _divufp8p24(_fp64_x8,  (uint64_t_t) 40320<<24 ) \
+                        _divufp8p24(_fp64_x8,  (uint64_t) 40320<<24 ) \
                         : (1<<24)
 
 #define _expfp8p8(x)    _expufp8p8(x)

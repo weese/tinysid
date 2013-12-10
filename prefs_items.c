@@ -60,7 +60,7 @@ void AddPrefsDefaults()
     PrefsAddInt32("samplerate", 44100);
     PrefsAddBool("audio16bit", true);
     PrefsAddBool("stereo", true);
-    PrefsAddBool("filters", true);
+    PrefsAddBool("filters", false);
     PrefsAddBool("dualsid", false);
     PrefsAddInt32("audioeffect", 2);
     PrefsAddInt32("revdelay", 125);
