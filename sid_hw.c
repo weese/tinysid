@@ -16,11 +16,11 @@
 #define LATCH_CP    23
 #define LATCH_ADDR  26
 #define LATCH_DATA  27
-#define LATCH_DELAY 500
+#define LATCH_DELAY 200
 
 #define SID_RW      2   // low=write, HIGH=read
 #define SID_BIT_A0  3   // first bit of address
-#define SID_DELAY   3000
+#define SID_DELAY   5000
 
 #define SID_RES     30
 #define SID_CS      22
@@ -40,7 +40,7 @@ const int GpioMemBlockLength = 0xfff;
  * Base addresses for GPIO blocks in memory
  */
 const uint32_t gpioAddrs[] = { 0x44E07000, 0x4804C000, 0x481AC000, 0x481AE000 };
-static volatile uint32_t *gpios[4];
+static uint32_t volatile *gpios[4];
 static int gpioFd;
 
 // Phi2 clock frequency
@@ -108,7 +108,7 @@ void pinSetValue(int pin, bool enable)
 void delay(uint32_t nanoSec)
 {
     volatile uint32_t x, y = 0;
-    for (x = 0; x < nanoSec; x += 5)
+    for (x = 0; x < nanoSec; x += 2)
         ++y;
 //    struct timespec delay;
 //    delay.tv_sec = 0;
@@ -173,22 +173,20 @@ void SIDInit()
     PrefsSetCallbackInt32("speed", prefs_speed_changed);
 }
 
+void SIDReset(uint32_t now)
+{
+    pinSetValue(SID_RES, false);
+    delay(10000);
+    pinSetValue(SID_RES, true);
+}
+
 /*
  *  Stop hardware SID connection
  */
 
 void SIDExit()
 {
-//	stopGPIO();
-}
-
-void SIDReset(uint32_t now)
-{
-    //printf("SID RESET ================\n");
-
-    pinSetValue(SID_RES, false);
-    delay(10000);
-    pinSetValue(SID_RES, true);
+    stopGPIO();
 }
 
 /*
@@ -243,6 +241,5 @@ void sid_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 
 uint32_t cia_period_usec()
 {
-    return ((uint32_t)(cia_timer + 1) * 10000ul) / ((cycles_per_second * speed_adjust) / 10000);
-    //return ((uint32_t)(cia_timer + 1) << 16) / ((speed_adjust * cycles_per_second) / 4096);
+    return ((uint32_t)(cia_timer + 1) * 50000ul) / ((cycles_per_second * speed_adjust) / 2000);
 }

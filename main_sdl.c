@@ -35,6 +35,7 @@ uint32_t cia_period_usec();
 
 #include <unistd.h>
 #include <sys/time.h>
+#include <signal.h>
 
 #include "main.h"
 #include "prefs.h"
@@ -112,6 +113,14 @@ static void quit()
 #endif
 }
 
+static bool keepRunning = true;
+
+void intHandler(int dummy) 
+{ 
+    keepRunning = false;
+    printf("Exiting...\n");
+} 
+
 int main(int argc, char **argv)
 {
     // Print banner
@@ -135,6 +144,8 @@ int main(int argc, char **argv)
 
     atexit(quit);
     InitAll(argc, argv);
+    signal(SIGINT, intHandler);
+
     int32_t speed = PrefsFindInt32("speed");
 
     // Parse non-option arguments
@@ -192,7 +203,7 @@ int main(int argc, char **argv)
     }
 #else
     struct timespec delay;
-    while (true)
+    while (keepRunning)
     {
         // Delay to maintain proper replay frequency
         int64_t nextIRQ = GetTicks_usec() + cia_period_usec();
@@ -215,6 +226,7 @@ int main(int argc, char **argv)
 		printf("too slow.\n");
 	}
     }
+    SIDReset(0);
 #endif
     ExitAll();
     return 0;

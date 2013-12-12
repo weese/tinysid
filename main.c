@@ -30,7 +30,6 @@
 #include "sid.h"
 #include "psid.h"
 
-
 // Global variables
 uint32_t f_rand_seed = 1;
 int number_of_songs, current_song;
@@ -73,7 +72,6 @@ void ExitAll()
     MemoryExit();
     PrefsExit();
 }
-
 
 /*
  *  Read PSID file header to buffer
