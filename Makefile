@@ -1,7 +1,7 @@
 CC = gcc
-CC = gcc-mp-4.7
+#CC = gcc-mp-4.7
 #CFLAGS = -Wall -ggdb -DUSE_SDL $(shell sdl-config --cflags)
-CFLAGS = -Wall -ggdb
+CFLAGS = -Wall -O3 -march=native
 #LDFLAGS = $(shell sdl-config --libs)
 
 OBJECTS = cpu.o main.o main_sdl.o mem.o prefs.o prefs_items.o sid.o

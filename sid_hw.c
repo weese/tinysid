@@ -13,17 +13,17 @@
 #include "prefs.h"
 
 
-#define LATCH_MR    22
 #define LATCH_CP    23
 #define LATCH_ADDR  26
 #define LATCH_DATA  27
-#define LATCH_DELAY 1000
+#define LATCH_DELAY 500
 
-#define SID_RESET   1   // low-active
 #define SID_RW      2   // low=write, HIGH=read
-#define SID_CS      4   // low-active
 #define SID_BIT_A0  3   // first bit of address
-#define SID_DELAY   1000
+#define SID_DELAY   3000
+
+#define SID_RES     30
+#define SID_CS      22
 
 
 #define DATA_OUT_REG    0x13C
@@ -40,7 +40,7 @@ const int GpioMemBlockLength = 0xfff;
  * Base addresses for GPIO blocks in memory
  */
 const uint32_t gpioAddrs[] = { 0x44E07000, 0x4804C000, 0x481AC000, 0x481AE000 };
-static uint32_t *gpios[4];
+static volatile uint32_t *gpios[4];
 static int gpioFd;
 
 // Phi2 clock frequency
@@ -82,7 +82,7 @@ void stopGPIO()
 {
     int i;
 	for (i = 0; i < 4; ++i)
-		munmap(gpios[i], GpioMemBlockLength);
+		munmap((void*)gpios[i], GpioMemBlockLength);
 	close(gpioFd);
 }
 
@@ -105,30 +105,31 @@ void pinSetValue(int pin, bool enable)
 		gpios[pin >> 5][DATA_CLEAR_REG / 4] = 1 << (pin & 31);
 }
 
-inline
 void delay(uint32_t nanoSec)
 {
-    struct timespec delay;
-    delay.tv_sec = 0;
-    delay.tv_nsec = nanoSec;
-    nanosleep(&delay, NULL);
+    volatile uint32_t x, y = 0;
+    for (x = 0; x < nanoSec; x += 5)
+        ++y;
+//    struct timespec delay;
+//    delay.tv_sec = 0;
+//    delay.tv_nsec = nanoSec;
+//    nanosleep(&delay, NULL);  
 }
 
 inline
 void latchWrite(uint8_t addr, uint8_t data)
 {
-    // disable reset
-    pinSetValue(LATCH_MR, true);
-
-    uint8_t mask;
-    for (mask = 0x80; mask != 0; mask >> 1)
+    uint8_t i;
+    for (i = 0; i < 8; ++i)
     {
         pinSetValue(LATCH_CP, false);
-        pinSetValue(LATCH_ADDR, (addr & mask) != 0);
-        pinSetValue(LATCH_DATA, (data & mask) != 0);
+        pinSetValue(LATCH_ADDR, addr >> 7);
+        pinSetValue(LATCH_DATA, data >> 7);
         delay(LATCH_DELAY);
         pinSetValue(LATCH_CP, true);
         delay(LATCH_DELAY);
+	addr <<= 1;
+	data <<= 1;
     }
 }
 
@@ -160,10 +161,11 @@ static void prefs_speed_changed(const char *name, int32_t from, int32_t to)
 void SIDInit()
 {
 	startGPIO();
-	pinSetDirection(LATCH_MR, true);
 	pinSetDirection(LATCH_CP, true);
 	pinSetDirection(LATCH_ADDR, true);
 	pinSetDirection(LATCH_DATA, true);
+	pinSetDirection(SID_RES, true);
+	pinSetDirection(SID_CS, true);
 
     set_cycles_per_second(PrefsFindString("victype", 0));
     speed_adjust = PrefsFindInt32("speed");
@@ -182,10 +184,11 @@ void SIDExit()
 
 void SIDReset(uint32_t now)
 {
-    // reset both shift registers (puts all lines to low incl. RES)
-    pinSetValue(LATCH_MR, false);
+    //printf("SID RESET ================\n");
+
+    pinSetValue(SID_RES, false);
     delay(10000);
-    latchWrite(SID_CS | SID_RESET, 0);
+    pinSetValue(SID_RES, true);
 }
 
 /*
@@ -230,17 +233,16 @@ uint32_t sid_read(uint32_t adr, uint32_t now)
 void sid_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
     // shift value to the latch
-    printf("sid_write %02x to %04x at cycle %d\n", byte, adr, now);
-
-    uint8_t a = (adr << SID_BIT_A0) | SID_RESET;
-
-    latchWrite(a | SID_CS, byte);
-    latchWrite(a, byte);
+    //printf("sid_write %02x to %04x at cycle %d\n", byte, adr, now);
+    pinSetValue(SID_CS, true);
+    latchWrite(adr << SID_BIT_A0, byte);
+    pinSetValue(SID_CS, false);
     delay(SID_DELAY);
-    latchWrite(a | SID_CS, byte);
+    pinSetValue(SID_CS, true);
 }
 
 uint32_t cia_period_usec()
 {
-    return ((uint32_t)(cia_timer + 1) << 16) / ((speed_adjust * cycles_per_second) / 4096);
+    return ((uint32_t)(cia_timer + 1) * 10000ul) / ((cycles_per_second * speed_adjust) / 10000);
+    //return ((uint32_t)(cia_timer + 1) << 16) / ((speed_adjust * cycles_per_second) / 4096);
 }

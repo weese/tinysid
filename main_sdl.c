@@ -191,31 +191,30 @@ int main(int argc, char **argv)
         }
     }
 #else
-    pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
-    pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-
-    pthread_mutex_lock(&mut);
+    struct timespec delay;
     while (true)
     {
-        struct timeval now;
-        gettimeofday(&now, NULL);
+        // Delay to maintain proper replay frequency
+        int64_t nextIRQ = GetTicks_usec() + cia_period_usec();
 
         // execute IRQ handler (that sends commands to the HW SID directly)
         UpdatePlayAdr();
         CPUExecute(play_adr, 0, 0, 0, 1000000);
 
-        uint32_t usec_time = cia_period_usec() + now.tv_usec;
-
-        // delay until next IRQ request
-        struct timespec timeout;
-        timeout.tv_sec = usec_time / 1000000 + now.tv_sec;
-        timeout.tv_nsec = (usec_time % 1000000) * 1000;
-
-        int retcode = pthread_cond_timedwait(&cond, &mut, &timeout);
-        if (retcode != ETIMEDOUT)
-            break;
+        int64_t delay_usec = nextIRQ - GetTicks_usec();
+	if (delay_usec > 0)
+        {
+//            Delay_usec(delay_usec);
+	    delay.tv_sec = delay_usec / 1000000;
+            delay.tv_nsec = (delay_usec % 1000000) * 1000;
+            nanosleep(&delay, NULL);
+//	    printf("%llu\n",delay_usec);
+	}
+	else
+	{
+		printf("too slow.\n");
+	}
     }
-    pthread_mutex_unlock(&mut);
 #endif
     ExitAll();
     return 0;
