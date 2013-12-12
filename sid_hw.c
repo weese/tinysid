@@ -4,12 +4,27 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <time.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
 
 #include "sid.h"
 #include "prefs.h"
+
+
+#define LATCH_MR    22
+#define LATCH_CP    23
+#define LATCH_ADDR  26
+#define LATCH_DATA  27
+#define LATCH_DELAY 1000
+
+#define SID_RESET   1   // low-active
+#define SID_RW      2   // low=write, HIGH=read
+#define SID_CS      4   // low-active
+#define SID_BIT_A0  3   // first bit of address
+#define SID_DELAY   1000
+
 
 #define DATA_OUT_REG    0x13C
 #define DATA_IN_REG     0x138
@@ -40,79 +55,6 @@ static int speed_adjust;        // Speed adjustment in percent
 
 // Clock frequency changed
 void SIDClockFreqChanged() {}
-
-/*
-struct BeagleGoo::GPIOInfo BeagleGoo::gpioInfos[] =
-	{
-		{ (char*) "P8_3", 1, 6, 0, 0 },
-		{ (char*) "P8_4", 1, 7, 0, 0 },
-		{ (char*) "P8_5", 1, 2, 0, 0 },
-		{ (char*) "P8_6", 1, 3, 0, 0 },
-		{ (char*) "P8_7", 2, 2, 0, 0 },
-		{ (char*) "P8_8", 2, 3, 0, 0 },
-		{ (char*) "P8_9", 2, 5, 0, 0 },
-		{ (char*) "P8_10", 2, 4, 0, 0 },
-		{ (char*) "P8_11", 1, 13, 0, 0 },
-		{ (char*) "P8_12", 1, 12, 0, 0 },
-		{ (char*) "P8_13", 0, 23, 0, 0 },
-		{ (char*) "P8_14", 0, 26, 0, 0 },
-		{ (char*) "P8_15", 1, 15, 0, 0 },
-		{ (char*) "P8_16", 1, 14, 0, 0 },
-		{ (char*) "P8_17", 0, 27, 0, 0 },
-		{ (char*) "P8_18", 2, 1, 0, 0 },
-		{ (char*) "P8_19", 0, 22, 0, 0 },
-		{ (char*) "P8_20", 1, 31, 0, 0 },
-		{ (char*) "P8_21", 1, 30, 0, 0 },
-		{ (char*) "P8_22", 1, 5, 0, 0 },
-		{ (char*) "P8_23", 1, 4, 0, 0 },
-		{ (char*) "P8_24", 1, 1, 0, 0 },
-		{ (char*) "P8_25", 1, 0, 0, 0 },
-		{ (char*) "P8_26", 1, 29, 0, 0 },
-		{ (char*) "P8_27", 2, 22, 0, 0 },
-		{ (char*) "P8_28", 2, 24, 0, 0 },
-		{ (char*) "P8_29", 2, 23, 0, 0 },
-		{ (char*) "P8_30", 2, 25, 0, 0 },
-		{ (char*) "P8_31", 0, 10, 0, 0 },
-		{ (char*) "P8_32", 0, 11, 0, 0 },
-		{ (char*) "P8_33", 0, 9, 0, 0 },
-		{ (char*) "P8_34", 2, 17, 0, 0 },
-		{ (char*) "P8_35", 0, 8, 0, 0 },
-		{ (char*) "P8_36", 2, 16, 0, 0 },
-		{ (char*) "P8_37", 2, 14, 0, 0 },
-		{ (char*) "P8_38", 2, 15, 0, 0 },
-		{ (char*) "P8_39", 2, 12, 0, 0 },
-		{ (char*) "P8_40", 2, 13, 0, 0 },
-		{ (char*) "P8_41", 2, 10, 0, 0 },
-		{ (char*) "P8_42", 2, 11, 0, 0 },
-		{ (char*) "P8_43", 2, 8, 0, 0 },
-		{ (char*) "P8_44", 2, 9, 0, 0 },
-		{ (char*) "P8_45", 2, 6, 0, 0 },
-		{ (char*) "P8_46", 2, 7, 0, 0 },
-
-		{ (char*) "P9_11", 0, 30, 0, 0 },
-		{ (char*) "P9_12", 1, 28, 0, 0 },
-		{ (char*) "P9_13", 0, 31, 0, 0 },
-		{ (char*) "P9_14", 1, 18, 0, 0 },
-		{ (char*) "P9_15", 1, 16, 0, 0 },
-		{ (char*) "P9_16", 1, 19, 0, 0 },
-		{ (char*) "P9_17", 0, 5, 0, 0 },
-		{ (char*) "P9_18", 0, 4, 0, 0 },
-		{ (char*) "P9_19", 0, 13, 0, 0 },
-		{ (char*) "P9_20", 0, 12, 0, 0 },
-		{ (char*) "P9_21", 0, 3, 0, 0 },
-		{ (char*) "P9_22", 0, 2, 0, 0 },
-		{ (char*) "P9_23", 1, 17, 0, 0 },
-		{ (char*) "P9_24", 0, 15, 0, 0 },
-		{ (char*) "P9_25", 3, 21, 0, 0 },
-		{ (char*) "P9_26", 0, 14, 0, 0 },
-		{ (char*) "P9_27", 3, 19, 0, 0 },
-		{ (char*) "P9_28", 3, 17, 0, 0 },
-		{ (char*) "P9_29", 3, 15, 0, 0 },
-		{ (char*) "P9_30", 3, 21, 0, 0 },
-		{ (char*) "P9_31", 3, 14, 0, 0 },
-		{ (char*) "P9_41", 0, 20, 0, 0 },
-		{ (char*) "P9_42", 0, 7, 0, 0 } };
-*/
 
 int startGPIO()
 {
@@ -145,22 +87,49 @@ void stopGPIO()
 }
 
 inline
-void setDirection(uint32_t *base, int pin, bool output)
+void pinSetDirection(int pin, bool output)
 {
 	if (output)
-		base[GPIO_OE_REG / 4] &= ~(1 << pin);
+		gpios[pin >> 5][GPIO_OE_REG / 4] &= ~(1 << (pin & 31));
 	else
-		base[GPIO_OE_REG / 4] |= 1 << pin;
+		gpios[pin >> 5][GPIO_OE_REG / 4] |= 1 << (pin & 31);
 
 }
 
 inline
-void setBit(uint32_t *base, int pin, bool enable)
+void pinSetValue(int pin, bool enable)
 {
 	if (enable)
-		base[DATA_SET_REG / 4] = 1 << pin;
+		gpios[pin >> 5][DATA_SET_REG / 4] = 1 << (pin & 31);
 	else
-		base[DATA_CLEAR_REG / 4] = 1 << pin;
+		gpios[pin >> 5][DATA_CLEAR_REG / 4] = 1 << (pin & 31);
+}
+
+inline
+void delay(uint32_t nanoSec)
+{
+    struct timespec delay;
+    delay.tv_sec = 0;
+    delay.tv_nsec = nanoSec;
+    nanosleep(&delay, NULL);
+}
+
+inline
+void latchWrite(uint8_t addr, uint8_t data)
+{
+    // disable reset
+    pinSetValue(LATCH_MR, true);
+
+    uint8_t mask;
+    for (mask = 0x80; mask != 0; mask >> 1)
+    {
+        pinSetValue(LATCH_CP, false);
+        pinSetValue(LATCH_ADDR, (addr & mask) != 0);
+        pinSetValue(LATCH_DATA, (data & mask) != 0);
+        delay(LATCH_DELAY);
+        pinSetValue(LATCH_CP, true);
+        delay(LATCH_DELAY);
+    }
 }
 
 static void set_cycles_per_second(const char *to)
@@ -190,9 +159,12 @@ static void prefs_speed_changed(const char *name, int32_t from, int32_t to)
 
 void SIDInit()
 {
-//	startGPIO();
-//	setDirection(gpios[0], 22, true);
-//	setDirection(gpios[0], 23, true);
+	startGPIO();
+	pinSetDirection(LATCH_MR, true);
+	pinSetDirection(LATCH_CP, true);
+	pinSetDirection(LATCH_ADDR, true);
+	pinSetDirection(LATCH_DATA, true);
+
     set_cycles_per_second(PrefsFindString("victype", 0));
     speed_adjust = PrefsFindInt32("speed");
     PrefsSetCallbackString("victype", prefs_victype_changed);
@@ -210,6 +182,10 @@ void SIDExit()
 
 void SIDReset(uint32_t now)
 {
+    // reset both shift registers (puts all lines to low incl. RES)
+    pinSetValue(LATCH_MR, false);
+    delay(10000);
+    latchWrite(SID_CS | SID_RESET, 0);
 }
 
 /*
@@ -255,26 +231,16 @@ void sid_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
     // shift value to the latch
     printf("sid_write %02x to %04x at cycle %d\n", byte, adr, now);
+
+    uint8_t a = (adr << SID_BIT_A0) | SID_RESET;
+
+    latchWrite(a | SID_CS, byte);
+    latchWrite(a, byte);
+    delay(SID_DELAY);
+    latchWrite(a | SID_CS, byte);
 }
 
 uint32_t cia_period_usec()
 {
     return ((uint32_t)(cia_timer + 1) << 16) / ((speed_adjust * cycles_per_second) / 4096);
 }
-
-
-/*
-int main()
-{
-    SIDInit();
-	for(int i=0;i<10;++i)
-	{
-		setBit(gpios[0], 23, true);
-		sleep(1);
-		setBit(gpios[0], 23, false);	
-		sleep(1);
-	}
-    SIDExit();
-    return 0;
-}
-*/
