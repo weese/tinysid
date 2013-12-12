@@ -2,11 +2,14 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
 
 #include "sid.h"
+#include "prefs.h"
 
 #define DATA_OUT_REG    0x13C
 #define DATA_IN_REG     0x138
@@ -27,12 +30,16 @@ static int gpioFd;
 
 // Phi2 clock frequency
 static uint32_t cycles_per_second;
-//const fp24p8_t PAL_CLOCK = ftofp24p8(985248.444);
-//const fp24p8_t NTSC_OLD_CLOCK = ftofp24p8(1000000.0);
-//const fp24p8_t NTSC_CLOCK = ftofp24p8(1022727.143);
+const uint32_t PAL_CLOCK = 985248;
+const uint32_t NTSC_OLD_CLOCK = 1000000;
+const uint32_t NTSC_CLOCK = 1022727;
 
 // Replay counter variables
-static uint16_t cia_timer;        // CIA timer A latch
+static uint16_t cia_timer;      // CIA timer A latch
+static int speed_adjust;        // Speed adjustment in percent
+
+// Clock frequency changed
+void SIDClockFreqChanged() {}
 
 /*
 struct BeagleGoo::GPIOInfo BeagleGoo::gpioInfos[] =
@@ -116,7 +123,7 @@ int startGPIO()
 		return 1;
 	}
     int i;
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; ++i)
 	{
 		gpios[i] = (uint32_t *) mmap(NULL, GpioMemBlockLength,
 				PROT_READ | PROT_WRITE, MAP_SHARED, gpioFd, gpioAddrs[i]);
@@ -132,7 +139,7 @@ int startGPIO()
 void stopGPIO()
 {
     int i;
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; ++i)
 		munmap(gpios[i], GpioMemBlockLength);
 	close(gpioFd);
 }
@@ -156,15 +163,40 @@ void setBit(uint32_t *base, int pin, bool enable)
 		base[DATA_CLEAR_REG / 4] = 1 << pin;
 }
 
+static void set_cycles_per_second(const char *to)
+{
+    if (strncmp(to, "6569", 4) == 0)
+        cycles_per_second = PAL_CLOCK;
+    else if (strcmp(to, "6567R5") == 0)
+        cycles_per_second = NTSC_OLD_CLOCK;
+    else
+        cycles_per_second = NTSC_CLOCK;
+}
+
+static void prefs_victype_changed(const char *name, const char *from, const char *to)
+{
+    set_cycles_per_second(to);
+    SIDClockFreqChanged();
+}
+
+static void prefs_speed_changed(const char *name, int32_t from, int32_t to)
+{
+    speed_adjust = to;
+}
+
 /*
  *  Start hardware SID connection
  */
 
 void SIDInit()
 {
-	startGPIO();
-	setDirection(gpios[0], 22, true);
-	setDirection(gpios[0], 23, true);
+//	startGPIO();
+//	setDirection(gpios[0], 22, true);
+//	setDirection(gpios[0], 23, true);
+    set_cycles_per_second(PrefsFindString("victype", 0));
+    speed_adjust = PrefsFindInt32("speed");
+    PrefsSetCallbackString("victype", prefs_victype_changed);
+    PrefsSetCallbackInt32("speed", prefs_speed_changed);
 }
 
 /*
@@ -173,7 +205,7 @@ void SIDInit()
 
 void SIDExit()
 {
-	stopGPIO();
+//	stopGPIO();
 }
 
 void SIDReset(uint32_t now)
@@ -195,6 +227,7 @@ void SIDSetReplayFreq(int freq)
 
 void SIDAdjustSpeed(int percent)
 {
+    PrefsReplaceInt32("speed", percent);
 }
 
 /*
@@ -221,7 +254,14 @@ uint32_t sid_read(uint32_t adr, uint32_t now)
 void sid_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
     // shift value to the latch
+    printf("sid_write %02x to %04x at cycle %d\n", byte, adr, now);
 }
+
+uint32_t cia_period_usec()
+{
+    return ((uint32_t)(cia_timer + 1) << 16) / ((speed_adjust * cycles_per_second) / 4096);
+}
+
 
 /*
 int main()

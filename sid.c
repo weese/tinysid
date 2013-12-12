@@ -81,7 +81,7 @@ static int32_t v1_panning, v2_panning, v3_panning, v4_panning;
 static int32_t dual_sep;
 
 // Number of SID clocks per sample frame
-static uint32_t sid_cycles;        // Integer
+static uint32_t sid_cycles;      // Integer
 static fp24p8_t sid_cycles_frac;    // With fractional part
 
 // Phi2 clock frequency
@@ -91,7 +91,7 @@ const fp24p8_t NTSC_OLD_CLOCK = ftofp24p8(1000000.0);
 const fp24p8_t NTSC_CLOCK = ftofp24p8(1022727.143);
 
 // Replay counter variables
-static uint16_t cia_timer;        // CIA timer A latch
+static uint16_t cia_timer;      // CIA timer A latch
 static int replay_count;        // Counter for timing replay routine
 static int speed_adjust;        // Speed adjustment in percent
 

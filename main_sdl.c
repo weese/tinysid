@@ -23,10 +23,14 @@
 #ifdef USE_SDL
 #include <SDL.h>
 #include <SDL_endian.h>
+#else
+#include <pthread.h>
+uint32_t cia_period_usec();
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <errno.h>
 
 #include <unistd.h>
@@ -34,6 +38,7 @@
 
 #include "main.h"
 #include "prefs.h"
+#include "cpu.h"
 #include "sid.h"
 
 
@@ -185,6 +190,32 @@ int main(int argc, char **argv)
                 break;
         }
     }
+#else
+    pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+    pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+    pthread_mutex_lock(&mut);
+    while (true)
+    {
+        struct timeval now;
+        gettimeofday(&now, NULL);
+
+        // execute IRQ handler (that sends commands to the HW SID directly)
+        UpdatePlayAdr();
+        CPUExecute(play_adr, 0, 0, 0, 1000000);
+
+        uint32_t usec_time = cia_period_usec() + now.tv_usec;
+
+        // delay until next IRQ request
+        struct timespec timeout;
+        timeout.tv_sec = usec_time / 1000000 + now.tv_sec;
+        timeout.tv_nsec = (usec_time % 1000000) * 1000;
+
+        int retcode = pthread_cond_timedwait(&cond, &mut, &timeout);
+        if (retcode != ETIMEDOUT)
+            break;
+    }
+    pthread_mutex_unlock(&mut);
 #endif
     ExitAll();
     return 0;

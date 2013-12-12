@@ -1,5 +1,5 @@
 CC = gcc
-#CC = gcc-mp-4.7
+CC = gcc-mp-4.7
 #CFLAGS = -Wall -ggdb -DUSE_SDL $(shell sdl-config --cflags)
 CFLAGS = -Wall -ggdb
 #LDFLAGS = $(shell sdl-config --libs)
