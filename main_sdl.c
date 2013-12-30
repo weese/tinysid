@@ -24,7 +24,10 @@
 #include <SDL.h>
 #include <SDL_endian.h>
 #else
-#include <pthread.h>
+//#include <pthread.h>
+#include <plib.h>
+#include "HardwareProfile.h"
+#include "delay.h"
 uint32_t cia_period_usec();
 #endif
 
@@ -33,7 +36,7 @@ uint32_t cia_period_usec();
 #include <string.h>
 #include <errno.h>
 
-#include <unistd.h>
+//#include <unistd.h>
 #include <sys/time.h>
 #include <signal.h>
 
@@ -123,6 +126,28 @@ void intHandler(int dummy)
 
 int main(int argc, char **argv)
 {
+	// Set all analog pins to be digital I/O
+    AD1PCFG = 0xFFFF;
+    
+    // Configure the proper PB frequency and the number of wait states
+	SYSTEMConfigPerformance(80000000L);
+	
+	// Open up the core timer at our 1ms rate
+	OpenCoreTimer(CORE_TICK_RATE);
+	
+    // set up the core timer interrupt with a prioirty of 2 and zero sub-priority
+	mConfigIntCoreTimer((CT_INT_ON | CT_INT_PRIOR_2 | CT_INT_SUB_PRIOR_0));
+	
+    // enable multi-vector interrupts
+	INTEnableSystemMultiVectoredInt();
+	
+	// Turn off JTAG so we get the pins back
+ 	mJTAGPortEnable(0);
+	
+//    //Initialize all of the LED pins
+	mInitAllLEDs();
+
+
     // Print banner
     printf(
         "SIDPlayer Version 4.4\n\n"
@@ -202,26 +227,32 @@ int main(int argc, char **argv)
         }
     }
 #else
-    struct timespec delay;
+//    struct timespec delay;
     while (keepRunning)
     {
         // Delay to maintain proper replay frequency
-        int64_t nextIRQ = GetTicks_usec() + cia_period_usec();
+//        int64_t nextIRQ = GetTicks_usec() + cia_period_usec();
+        usTimer = GetTicks_usec();
 
         // execute IRQ handler (that sends commands to the HW SID directly)
         UpdatePlayAdr();
         CPUExecute(play_adr, 0, 0, 0, 1000000);
 
-        int64_t delay_usec = nextIRQ - GetTicks_usec();
-	if (delay_usec > 0)
-        {
-//            Delay_usec(delay_usec);
-	    delay.tv_sec = delay_usec / 1000000;
-            delay.tv_nsec = (delay_usec % 1000000) * 1000;
-            nanosleep(&delay, NULL);
-//	    printf("%llu\n",delay_usec);
-	}
-	else
+//        int64_t delay_usec = nextIRQ - GetTicks_usec();
+//	if (delay_usec > 0)
+//        {
+////            Delay_usec(delay_usec);
+//	    delay.tv_sec = delay_usec / 1000000;
+//            delay.tv_nsec = (delay_usec % 1000000) * 1000;
+//            nanosleep(&delay, NULL);
+////	    printf("%llu\n",delay_usec);
+//	}
+//	else
+    if (usTimer != 0)
+    {
+        while (usTimer);
+    }
+    else
 	{
 		printf("too slow.\n");
 	}
