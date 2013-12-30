@@ -30,6 +30,8 @@
 #include "sid.h"
 #include "psid.h"
 
+#include "calabash.h"
+
 // Global variables
 uint32_t f_rand_seed = 1;
 int number_of_songs, current_song;
@@ -80,13 +82,14 @@ void ExitAll()
 bool LoadPSIDHeader(const char *file, uint8_t *p)
 {
     // Read header
-    memset(p, 0, PSID_MAX_HEADER_LENGTH);
-    FILE *f = fopen(file, "rb");
-    if (f == NULL)
-        return false;
-    size_t actual = fread(p, 1, PSID_MAX_HEADER_LENGTH, f);
-    fclose(f);
-    return actual >= PSID_MIN_HEADER_LENGTH;
+    memcpy(p, calabash, PSID_MAX_HEADER_LENGTH);
+//    memset(p, 0, PSID_MAX_HEADER_LENGTH);
+//    FILE *f = fopen(file, "rb");
+//    if (f == NULL)
+//        return false;
+//    size_t actual = fread(p, 1, PSID_MAX_HEADER_LENGTH, f);
+//    fclose(f);
+//    return actual >= PSID_MIN_HEADER_LENGTH;
 }
 
 
@@ -126,22 +129,24 @@ bool IsPSIDFile(const char *file)
 bool LoadPSIDFile(const char *file)
 {
     // Open file
-    FILE *f = fopen(file, "rb");
-    if (f == NULL)
-        return false;
+//    FILE *f = fopen(file, "rb");
+//    if (f == NULL)
+//        return false;
 
     // Clear C64 RAM
     MemoryClear();
     psid_loaded = false;
 
     // Load and check header
-    uint8_t header[PSID_MAX_HEADER_LENGTH];
-    memset(header, 0, PSID_MAX_HEADER_LENGTH);
-    size_t actual = fread(header, 1, PSID_MAX_HEADER_LENGTH, f);
-    if (actual < PSID_MIN_HEADER_LENGTH || !IsPSIDHeader(header)) {
-        fclose(f);
-        return false;
-    }
+//    uint8_t header[PSID_MAX_HEADER_LENGTH];
+//    memset(header, 0, PSID_MAX_HEADER_LENGTH);
+//    size_t actual = fread(header, 1, PSID_MAX_HEADER_LENGTH, f);
+//    if (actual < PSID_MIN_HEADER_LENGTH || !IsPSIDHeader(header)) {
+//        fclose(f);
+//        return false;
+//    }
+
+    const unsigned char *header = calabash;
 
     // Extract data from header
     number_of_songs = read_psid_16(header, PSID_NUMBER);
@@ -167,21 +172,25 @@ bool LoadPSIDFile(const char *file)
     copyright_info[32] = 0;
 
     // Seek to start of module data
-    fseek(f, read_psid_16(header, PSID_LENGTH), SEEK_SET);
+//    fseek(f, read_psid_16(header, PSID_LENGTH), SEEK_SET);
+    unsigned char *module = calabash + read_psid_16(header, PSID_LENGTH);
 
     // Find load address
     uint16_t load_adr = read_psid_16(header, PSID_START);
     if (load_adr == 0) {    // Load address is at start of module data
-        uint8_t lo = fgetc(f);
-        uint8_t hi = fgetc(f);
+//        uint8_t lo = fgetc(f);
+//        uint8_t hi = fgetc(f);
+        uint8_t lo = *(module++);
+        uint8_t hi = *(module++);
         load_adr = (hi << 8) | lo;
     }
     if (init_adr == 0)        // Init routine address is equal to load address
         init_adr = load_adr;
 
     // Load module data to C64 RAM
-    fread(ram + load_adr, 1, RAM_SIZE - load_adr, f);
-    fclose(f);
+//    fread(ram + load_adr, 1, RAM_SIZE - load_adr, f);
+//    fclose(f);
+    memcpy(ram + load_adr, module, sizeof(calabash) - (module - calabash));
 
     // Select default song
     SelectSong(current_song);
