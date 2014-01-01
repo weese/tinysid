@@ -38,10 +38,7 @@ const uint32_t NTSC_CLOCK = 1022727;
 static uint16_t cia_timer;      // CIA timer A latch
 static uint32_t speed_adjust;   // Speed adjustment in percent
 
-// Clock frequency changed
-void SIDClockFreqChanged() {}
-
-#define SID_DELAY   50
+#define SID_DELAY   30
 
 #define SID_PORT    GPIOB       // PB0-PB7 data, PB8-PB12 addr
 #define SID_RW      GPIO_Pin_13 // low=write, HIGH=read, PB13
@@ -147,6 +144,12 @@ void startTimers(void)
     TIM_ARRPreloadConfig(TIM3, ENABLE);
     TIM_Cmd(TIM3, ENABLE);
     TIM_Cmd(TIM4, ENABLE);
+}
+
+// Clock frequency changed
+void SIDClockFreqChanged()
+{
+//    TIM_PrescalerConfig(TIM3, ((SystemCoreClock / 2) / cycles_per_second) - 1, TIM_PSCReloadMode_Immediate);
 }
 
 void delay(uint32_t nanoSec)
@@ -273,7 +276,9 @@ void sid_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
     //printf("sid_write %02x to %04x at cycle %d\n", byte, adr, now);
     uint16_t val = byte | (adr << 8) | SID_RES;
     GPIO_Write(SID_PORT, val | SID_CS);
+    delay(SID_DELAY);
     GPIO_Write(SID_PORT, val);
     delay(SID_DELAY);
     GPIO_Write(SID_PORT, val | SID_CS);
+    delay(SID_DELAY);
 }
