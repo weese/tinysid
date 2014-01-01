@@ -18,15 +18,10 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "sys.h"
-
-#ifdef USE_SDL
-#include <SDL.h>
-#include <SDL_endian.h>
-#else
 #include <pthread.h>
-uint32_t cia_period_usec();
-#endif
+#include "stm32f4xx_it.h"
+#include <stm32f4xx_usart.h>
+#include <stm32f4_discovery.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,58 +36,6 @@ uint32_t cia_period_usec();
 #include "prefs.h"
 #include "cpu.h"
 #include "sid.h"
-
-
-/*
- *  Get current value of microsecond timer
- */
-
-uint64_t GetTicks_usec()
-{
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    return t.tv_sec * 1000000 + t.tv_usec;
-}
-
-
-/*
- *  Delay by specified number of microseconds (<1 second)
- *  (adapted from SDL_Delay() source)
- */
-
-void Delay_usec(uint32_t usec)
-{
-    int was_error;
-#ifndef __linux__    /* Non-Linux implementations need to calculate time left */
-    uint64_t then, now, elapsed;
-#endif
-    struct timeval tv;
-
-    /* Set the timeout interval - Linux only needs to do this once */
-#ifdef __linux__
-    tv.tv_sec = 0;
-    tv.tv_usec = usec;
-#else
-    then = GetTicks_usec();
-#endif
-    do {
-        errno = 0;
-#ifndef __linux__
-        /* Calculate the time interval left (in case of interrupt) */
-        now = GetTicks_usec();
-        elapsed = (now-then);
-        then = now;
-        if ( elapsed >= usec ) {
-            break;
-        }
-        usec -= elapsed;
-        tv.tv_sec = 0;
-        tv.tv_usec = usec;
-#endif
-        was_error = select(0, NULL, NULL, NULL, &tv);
-    } while (was_error && (errno == EINTR));
-}
-
 
 /*
  *  Main program
@@ -116,13 +59,96 @@ static void quit()
 static bool keepRunning = true;
 
 void intHandler(int dummy) 
-{ 
+{
+    (void) dummy;
     keepRunning = false;
     printf("Exiting...\n");
 } 
 
-int main(int argc, char **argv)
+void usart2_init()
 {
+	GPIO_InitTypeDef GPIO_InitStructure;
+	USART_InitTypeDef USART_InitStructure;
+
+	/* enable peripheral clock for USART2 */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+
+
+	/* GPIOA clock enable */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	/* GPIOA Configuration:  USART2 TX on PA2 */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+	/* Connect USART2 pins to AF2 */
+	// TX = PA2
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2);
+
+	USART_InitStructure.USART_BaudRate = 9600;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_InitStructure.USART_Mode = USART_Mode_Tx;
+	USART_Init(USART2, &USART_InitStructure);
+
+	USART_Cmd(USART2, ENABLE); // enable USART2
+
+
+//    USART_InitTypeDef USART_InitStructure;
+//    USART_InitStructure.USART_BaudRate = 115200;
+//    USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+//    USART_InitStructure.USART_StopBits = USART_StopBits_1;
+//    USART_InitStructure.USART_Parity = USART_Parity_No;
+//    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+//    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+//
+//    GPIO_InitTypeDef GPIO_InitStructure;
+//    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+//    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+//
+//    /* Configure USART Tx as push-pull */
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//    GPIO_Init(GPIOA, &GPIO_InitStructure);
+//
+//    /* Configure USART Rx as input floating */
+//    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+//    GPIO_Init(GPIOA, &GPIO_InitStructure);
+//
+//    /* USART configuration */
+//    USART_Init(USART2, &USART_InitStructure);
+//
+//    /* Enable USART */
+//    USART_Cmd(USART2, ENABLE);
+}
+
+//int main(int argc, char **argv)
+int main(void)
+{
+    int argc = 2;
+    char *argv[] = { "./tinysid", "calabash.sid" };
+    STM_EVAL_LEDInit(LED3);
+    STM_EVAL_LEDInit(LED4);
+    STM_EVAL_LEDInit(LED5);
+    STM_EVAL_LEDInit(LED6);
+
+    STM_EVAL_LEDOn(LED3);
+
+    //by default stdin/stdout are on usart2
+    usart2_init();
+    // turn off buffers, so IO occurs immediately
+    setvbuf(stdin, NULL, _IONBF, 0);
+    setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
+
     // Print banner
     printf(
         "SIDPlayer Version 4.4\n\n"
@@ -202,29 +228,17 @@ int main(int argc, char **argv)
         }
     }
 #else
-    struct timespec delay;
+    STM_EVAL_LEDOn(LED3);
     while (keepRunning)
     {
-        // Delay to maintain proper replay frequency
-        int64_t nextIRQ = GetTicks_usec() + cia_period_usec();
-
         // execute IRQ handler (that sends commands to the HW SID directly)
+        STM_EVAL_LEDOn(LED4);
         UpdatePlayAdr();
         CPUExecute(play_adr, 0, 0, 0, 1000000);
+        STM_EVAL_LEDOff(LED4);
 
-        int64_t delay_usec = nextIRQ - GetTicks_usec();
-	if (delay_usec > 0)
-        {
-//            Delay_usec(delay_usec);
-	    delay.tv_sec = delay_usec / 1000000;
-            delay.tv_nsec = (delay_usec % 1000000) * 1000;
-            nanosleep(&delay, NULL);
-//	    printf("%llu\n",delay_usec);
-	}
-	else
-	{
-		printf("too slow.\n");
-	}
+        while ((pending_IRQs & IRQ_CIA_A) == 0);
+        pending_IRQs &= ~IRQ_CIA_A;
     }
     SIDReset(0);
 #endif

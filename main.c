@@ -18,8 +18,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "sys.h"
-
 #include <stdio.h>
 #include <string.h>
 
@@ -47,7 +45,6 @@ static uint16_t init_adr;                // C64 init routine address
 uint16_t play_adr;                    // C64 replay routine address
 static bool play_adr_from_irq_vec;    // Flag: dynamically update play_adr from IRQ vector ($0314/$0315 or $fffe/$ffff)
 static uint32_t speed_flags;            // Speed flags (1 bit/song)
-
 
 
 /*
@@ -81,8 +78,10 @@ void ExitAll()
 
 bool LoadPSIDHeader(const char *file, uint8_t *p)
 {
+    (void) file;
     // Read header
     memcpy(p, calabash, PSID_MAX_HEADER_LENGTH);
+    return true;
 //    memset(p, 0, PSID_MAX_HEADER_LENGTH);
 //    FILE *f = fopen(file, "rb");
 //    if (f == NULL)
@@ -128,6 +127,8 @@ bool IsPSIDFile(const char *file)
 
 bool LoadPSIDFile(const char *file)
 {
+    (void) file;
+
     // Open file
 //    FILE *f = fopen(file, "rb");
 //    if (f == NULL)
@@ -173,7 +174,7 @@ bool LoadPSIDFile(const char *file)
 
     // Seek to start of module data
 //    fseek(f, read_psid_16(header, PSID_LENGTH), SEEK_SET);
-    unsigned char *module = calabash + read_psid_16(header, PSID_LENGTH);
+    const unsigned char *module = calabash + read_psid_16(header, PSID_LENGTH);
 
     // Find load address
     uint16_t load_adr = read_psid_16(header, PSID_START);

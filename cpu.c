@@ -18,8 +18,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "sys.h"
-
 #include "mem.h"
 #include "sid.h"
 
@@ -78,16 +76,21 @@ void CPUExit()
 
 static uint32_t ram_read(uint32_t adr, uint32_t now)
 {
+    (void) now;
     return ram[adr];
 }
 
 static void ram_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
+    (void) now;
+    (void) rmw;
     ram[adr] = byte;
 }
 
 static void cia_write(uint32_t adr, uint32_t byte, uint32_t now, bool rmw)
 {
+    (void) now;
+    (void) rmw;
     if (adr == 0xdc04)
         cia_tl_write(byte);
     else if (adr == 0xdc05)

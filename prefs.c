@@ -18,8 +18,6 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "sys.h"
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -168,7 +166,7 @@ static void print_options(const prefs_desc *list)
                     break;
                 case TYPE_INT32:
                     typestr = "NUMBER";
-                    sprintf(numstr, "%d", PrefsFindInt32(list->name));
+                    sprintf(numstr, "%ld", PrefsFindInt32(list->name));
                     defstr = numstr;
                     break;
                 default:

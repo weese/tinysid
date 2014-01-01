@@ -18,34 +18,33 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "sys.h"
 #include "prefs.h"
 
 
 // List of preferences items
 prefs_desc common_prefs_items[] = {
-    {"victype", TYPE_STRING, false,     "type number of VIC-II to emulate (6569, 6567 or 6567R5)"},
-    {"sidtype", TYPE_STRING, false,     "type number of SID to emulate (6581 or 8580)"},
-    {"samplerate", TYPE_INT32, false,   "output sample rate in Hz"},
-    {"audio16bit", TYPE_BOOLEAN, false, "16-bit audio output"},
-    {"stereo", TYPE_BOOLEAN, false,     "stereo audio output"},
-    {"filters", TYPE_BOOLEAN, false,    "emulate SID filters"},
-    {"dualsid", TYPE_BOOLEAN, false,    "emulate dual SID chips"},
-    {"audioeffect", TYPE_INT32, false,  "audio effect type (0 = none, 1 = reverb, 2 = spatial)"},
-    {"revdelay", TYPE_INT32, false,     "effect delay in ms"},
-    {"revfeedback", TYPE_INT32, false,  "effect feedback (0..256 = 0..100%)"},
-    {"volume", TYPE_INT32, false,       "master volume (0..256 = 0..100%)"},
-    {"v1volume", TYPE_INT32, false,     "volume voice 1 (0..256 = 0..100%)"},
-    {"v2volume", TYPE_INT32, false,     "volume voice 2 (0..256 = 0..100%)"},
-    {"v3volume", TYPE_INT32, false,     "volume voice 3 (0..256 = 0..100%)"},
-    {"v4volume", TYPE_INT32, false,     "volume sampled voice (0..256 = 0..100%)"},
-    {"v1pan", TYPE_INT32, false,        "panning voice 1 (-256..256 = left..right)"},
-    {"v2pan", TYPE_INT32, false,        "panning voice 2 (-256..256 = left..right)"},
-    {"v3pan", TYPE_INT32, false,        "panning voice 3 (-256..256 = left..right)"},
-    {"v4pan", TYPE_INT32, false,        "panning sampled voice (-256..256 = left..right)"},
-    {"dualsep", TYPE_INT32, false,      "dual SID stereo separation (0..256 = 0..100%)"},
-    {"speed", TYPE_INT32, false,        "replay speed adjustment (percent)"},
-    {NULL, TYPE_END, false}    // End of list
+    {"victype", TYPE_STRING, false,     "type number of VIC-II to emulate (6569, 6567 or 6567R5)", NULL},
+    {"sidtype", TYPE_STRING, false,     "type number of SID to emulate (6581 or 8580)", NULL},
+    {"samplerate", TYPE_INT32, false,   "output sample rate in Hz", NULL},
+    {"audio16bit", TYPE_BOOLEAN, false, "16-bit audio output", NULL},
+    {"stereo", TYPE_BOOLEAN, false,     "stereo audio output", NULL},
+    {"filters", TYPE_BOOLEAN, false,    "emulate SID filters", NULL},
+    {"dualsid", TYPE_BOOLEAN, false,    "emulate dual SID chips", NULL},
+    {"audioeffect", TYPE_INT32, false,  "audio effect type (0 = none, 1 = reverb, 2 = spatial)", NULL},
+    {"revdelay", TYPE_INT32, false,     "effect delay in ms", NULL},
+    {"revfeedback", TYPE_INT32, false,  "effect feedback (0..256 = 0..100%)", NULL},
+    {"volume", TYPE_INT32, false,       "master volume (0..256 = 0..100%)", NULL},
+    {"v1volume", TYPE_INT32, false,     "volume voice 1 (0..256 = 0..100%)", NULL},
+    {"v2volume", TYPE_INT32, false,     "volume voice 2 (0..256 = 0..100%)", NULL},
+    {"v3volume", TYPE_INT32, false,     "volume voice 3 (0..256 = 0..100%)", NULL},
+    {"v4volume", TYPE_INT32, false,     "volume sampled voice (0..256 = 0..100%)", NULL},
+    {"v1pan", TYPE_INT32, false,        "panning voice 1 (-256..256 = left..right)", NULL},
+    {"v2pan", TYPE_INT32, false,        "panning voice 2 (-256..256 = left..right)", NULL},
+    {"v3pan", TYPE_INT32, false,        "panning voice 3 (-256..256 = left..right)", NULL},
+    {"v4pan", TYPE_INT32, false,        "panning sampled voice (-256..256 = left..right)", NULL},
+    {"dualsep", TYPE_INT32, false,      "dual SID stereo separation (0..256 = 0..100%)", NULL},
+    {"speed", TYPE_INT32, false,        "replay speed adjustment (percent)", NULL},
+    {NULL, TYPE_END, false, NULL, NULL}    // End of list
 };
 
 

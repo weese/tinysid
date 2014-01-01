@@ -24,6 +24,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#define IRQ_CIA_A   0x01
+
+extern volatile uint8_t pending_IRQs;
+
 
 /*
  *  Functions
@@ -51,6 +55,7 @@ extern void SIDAdjustSpeed(int percent);
 // Write to CIA timer A (changes replay frequency)
 extern void cia_tl_write(uint8_t byte);
 extern void cia_th_write(uint8_t byte);
+extern uint32_t cia_period_usec();
 
 // Read from SID register
 extern uint32_t sid_read(uint32_t adr, uint32_t now);
